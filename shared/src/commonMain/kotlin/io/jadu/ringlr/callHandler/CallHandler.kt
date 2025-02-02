@@ -10,5 +10,6 @@ expect class PlatformConfiguration {
     // Platform-specific initialization
     fun initialize()
 
+    // Platform-specific cleanup
     fun cleanup()
 }
