@@ -38,6 +38,11 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        getByName("commonMain") {
+            dependencies {
+                implementation(libs.kotlinx.coroutines.core)
+            }
+        }
     }
 }
 
