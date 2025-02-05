@@ -27,9 +27,8 @@ expect class PlatformConfiguration {
  * Android: Implements using Telecom framework
  * iOS: Implements using CallKit
  */
-expect class CallManagerImpl : CallManager {
+expect class CallManagerImpl(configuration: PlatformConfiguration) : CallManager {
     // Constructor that takes platform configuration
-    constructor(configuration: PlatformConfiguration)
 
     // Call State Management
     override suspend fun startOutgoingCall(number: String, displayName: String): CallResult<Call>

@@ -50,8 +50,6 @@ actual class PlatformConfiguration(
         Manager().registerPhoneAccount(context,telecomManager)
     }
 
-
-
     actual fun cleanup() {
         Manager().unregisterPhoneAccount()
     }
@@ -64,7 +62,7 @@ actual class PlatformConfiguration(
  * iOS: Implements using CallKit
  */
 actual class CallManagerImpl actual constructor(
-    private val configuration: PlatformConfiguration
+    configuration: PlatformConfiguration
 ): CallManager {
     private val manager = Manager();
     private val context = (configuration as PlatformConfiguration).context
