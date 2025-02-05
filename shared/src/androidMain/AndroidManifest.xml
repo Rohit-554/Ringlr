@@ -19,7 +19,7 @@
     <uses-feature android:name="android.hardware.telephony" android:required="true" />
     <uses-feature android:name="android.hardware.microphone" android:required="true" />
 
-    <application>
+    <application android:name=".RinglrApp">
         <!-- Registration of our Connection Service -->
         <service
             android:name=".callHandler.CallConnectionService"
