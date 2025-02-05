@@ -1,11 +1,13 @@
 package io.jadu.ringlr.callHandler
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.telecom.Connection
 import android.telecom.TelecomManager
+import android.telephony.DisconnectCause
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
@@ -100,7 +102,27 @@ actual class CallManagerImpl actual constructor(
 
 
     actual override suspend fun endCall(callId: String): CallResult<Unit> {
-        TODO("Not yet implemented")
+        return try {
+            val activeCall = connections[callId] ?: throw IllegalStateException("No active call found with ID: $callId")
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                if (!hasPermission(android.Manifest.permission.ANSWER_PHONE_CALLS)) {
+                    return CallResult.Error(CallError.PermissionDenied("ANSWER_PHONE_CALLS permission not granted"))
+                }
+            }
+            activeCall.setDisconnected(android.telecom.DisconnectCause(DisconnectCause.LOCAL))
+            activeCall.destroy()
+            connections.remove(callId)
+            CallResult.Success(Unit)
+        } catch (e: SecurityException) {
+            CallResult.Error(CallError.PermissionDenied(e.message ?: "Permission denied"))
+        } catch (e: Exception) {
+            CallResult.Error(CallError.ServiceError("Failed to end call: ${e.message}", -1))
+        }
+    }
+
+    private fun hasPermission(permission: String): Boolean {
+        return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
     }
 
     actual override suspend fun muteCall(
