@@ -2,7 +2,6 @@ package io.jadu.ringlr.callHandler
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.net.Uri
@@ -12,9 +11,6 @@ import android.telecom.CallAudioState
 import android.telecom.Connection
 import android.telecom.TelecomManager
 import android.telephony.DisconnectCause
-import android.telephony.PhoneStateListener
-import android.telephony.TelephonyCallback
-import android.telephony.TelephonyManager
 import io.jadu.ringlr.configs.AudioRoute
 import io.jadu.ringlr.configs.Call
 import io.jadu.ringlr.configs.CallError
@@ -22,16 +18,10 @@ import io.jadu.ringlr.configs.CallManager
 import io.jadu.ringlr.configs.CallResult
 import io.jadu.ringlr.configs.CallState
 import io.jadu.ringlr.configs.CallStateCallback
-import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import java.util.UUID
-import java.util.concurrent.TimeoutException
-import kotlin.coroutines.resume
 
 /**
  * Expected platform-specific configuration class that holds essential platform settings.
@@ -53,7 +43,6 @@ actual class PlatformConfiguration(
     actual fun cleanup() {
         Manager().unregisterPhoneAccount()
     }
-
 }
 
 /**
@@ -61,7 +50,7 @@ actual class PlatformConfiguration(
  * Android: Implements using Telecom framework
  * iOS: Implements using CallKit
  */
-actual class CallManagerImpl actual constructor(
+actual class CallManager actual constructor(
     configuration: PlatformConfiguration
 ): CallManager {
     private val manager = Manager();

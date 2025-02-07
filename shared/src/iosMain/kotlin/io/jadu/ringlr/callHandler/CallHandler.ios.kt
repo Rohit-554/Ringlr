@@ -26,7 +26,7 @@ actual class PlatformConfiguration {
  * Android: Implements using Telecom framework
  * iOS: Implements using CallKit
  */
-actual class CallManagerImpl : CallManager {
+actual class CallManager : CallManager {
     actual constructor(configuration: PlatformConfiguration) {
         TODO("Not yet implemented")
     }
