@@ -24,6 +24,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
 
 /**
+ * Written and Updated by Rohit on 9th feb 2025
+ * */
+
+/**
  * Expected platform-specific configuration class that holds essential platform settings.
  * Android: Will contain Context and necessary Android-specific configurations
  * iOS: Will contain CallKit and AVAudioSession configurations
@@ -126,13 +130,6 @@ actual class CallManager actual constructor(
         } catch (e: Exception) {
             CallResult.Error(CallError.ServiceError("Failed to start call: ${e.message}", -1))
         }
-    }
-
-    override suspend fun startCustomOutgoingCall(
-        number: String,
-        displayName: String
-    ): CallResult<Call> {
-        TODO("Not yet implemented")
     }
 
     actual override suspend fun endCall(callId: String): CallResult<Unit> {

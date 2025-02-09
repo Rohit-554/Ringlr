@@ -17,8 +17,6 @@ interface CallManagerInterface {
      */
     suspend fun startOutgoingCall(number: String, displayName: String, scheme:String = "tel"): CallResult<Call>
 
-    suspend fun startCustomOutgoingCall(number: String, displayName: String): CallResult<Call>
-
     /**
      * Ends an active call.
      * @param callId The ID of the call to end

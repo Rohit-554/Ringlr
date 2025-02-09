@@ -47,7 +47,8 @@ actual class CallManager : CallManagerInterface {
 
     actual override suspend fun startOutgoingCall(
         number: String,
-        displayName: String
+        displayName: String,
+        scheme: String
     ): CallResult<Call> {
         TODO("Not yet implemented")
     }
