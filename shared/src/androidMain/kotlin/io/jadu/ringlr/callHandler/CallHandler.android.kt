@@ -14,7 +14,7 @@ import android.telephony.DisconnectCause
 import io.jadu.ringlr.configs.AudioRoute
 import io.jadu.ringlr.configs.Call
 import io.jadu.ringlr.configs.CallError
-import io.jadu.ringlr.configs.CallManager
+import io.jadu.ringlr.configs.CallManagerInterface
 import io.jadu.ringlr.configs.CallResult
 import io.jadu.ringlr.configs.CallState
 import io.jadu.ringlr.configs.CallStateCallback
@@ -29,19 +29,42 @@ import kotlinx.coroutines.withContext
  * iOS: Will contain CallKit and AVAudioSession configurations
  */
 actual class PlatformConfiguration(
-    val context:Context
+    val context: Context
 ) {
 
+    private val manager = Manager(context)
     private val telecomManager: TelecomManager by lazy {
         context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
     }
 
-    actual fun initialize() {
-        Manager().registerPhoneAccount(context,telecomManager)
+    actual fun initializeCallConfiguration() {
+        manager.registerPhoneAccount(context, telecomManager)
     }
 
-    actual fun cleanup() {
-        Manager().unregisterPhoneAccount()
+    actual fun cleanupCallConfiguration() {
+        manager.unregisterPhoneAccount(telecomManager)
+    }
+
+    actual companion object {
+        actual fun create(): PlatformConfiguration {
+            return PlatformConfiguration(context = appContext)
+        }
+        private lateinit var appContext: Context
+        fun init(context: Context) {
+            appContext = context
+        }
+    }
+
+    /**
+     * Custom Call Configuration
+     * @param setHighlightColor: Int
+     * @param setDescription: String
+     * @param setSupportedUriSchemes: List<String> Supported URI schemes e.g "tel", "sip", etc.
+     * By default, "tel" is mostly Used.
+     * @return Unit
+     */
+    actual fun initializeCustomCallConfiguration(setHighlightColor:Int, setDescription:String, setSupportedUriSchemes:List<String>) {
+        manager.registerCustomUiPhoneAccount(telecomManager, setHighlightColor, setDescription, setSupportedUriSchemes)
     }
 }
 
@@ -52,9 +75,9 @@ actual class PlatformConfiguration(
  */
 actual class CallManager actual constructor(
     configuration: PlatformConfiguration
-): CallManager {
-    private val manager = Manager();
+) : CallManagerInterface {
     private val context = (configuration as PlatformConfiguration).context
+    private val manager = Manager(context);
     private val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
     private val connections = mutableMapOf<String, Connection>()
     private val callStateCallbacks = mutableSetOf<CallStateCallback>()
@@ -62,39 +85,60 @@ actual class CallManager actual constructor(
 
     actual override suspend fun startOutgoingCall(
         number: String,
-        displayName: String
-    ): CallResult<Call> = withContext(Dispatchers.Main){
+        displayName: String,
+        scheme: String
+    ): CallResult<Call> = withContext(Dispatchers.Main) {
         try {
-            when(val permissionResult = checkPermissions()){
-                is CallResult.Error -> return@withContext permissionResult
-                else -> {
-                    // Implementation for starting outgoing call
-                    CallResult.Success(Call(1.toString(),number,displayName,CallState.DIALING,manager.getCurrentTime()))
+            /*when (val permissionResult = checkPermissions()) {
+                is CallResult.Error -> {
+                    Log.d("CallHandler", "io.jadu.ringlr.permissionUtils.Permission denied ${permissionResult.error.message}")
+                    return@withContext permissionResult
                 }
-            }
+
+                else -> {
+                    Log.d("CallHandler", "io.jadu.ringlr.permissionUtils.Permission granted")
+                    // Implementation for starting outgoing call
+                    CallResult.Success(
+                        Call(
+                            1.toString(),
+                            number,
+                            displayName,
+                            CallState.DIALING,
+                            manager.getCurrentTime()
+                        )
+                    )
+                }
+            }*/
 
             val outgoingCallExtras = Bundle().apply {
                 putString("display_name", displayName)
             }
 
+            val callScheme = scheme.ifEmpty { "tel" }
             telecomManager.placeCall(
-                Uri.fromParts("tel", number, null),
+                Uri.fromParts(callScheme, number, null),
                 outgoingCallExtras
             )
-
-            val call = manager.waitForCallEstablishment(number,context)
+            val call = manager.waitForCallEstablishment(number, context)
             CallResult.Success(call)
         } catch (e: SecurityException) {
-            CallResult.Error(CallError.PermissionDenied("Permission denied: ${e.message}"))
+            CallResult.Error(CallError.PermissionDenied("io.jadu.ringlr.permissionUtils.Permission denied: ${e.message}"))
         } catch (e: Exception) {
             CallResult.Error(CallError.ServiceError("Failed to start call: ${e.message}", -1))
         }
     }
 
+    override suspend fun startCustomOutgoingCall(
+        number: String,
+        displayName: String
+    ): CallResult<Call> {
+        TODO("Not yet implemented")
+    }
 
     actual override suspend fun endCall(callId: String): CallResult<Unit> {
         return try {
-            val activeCall = connections[callId] ?: throw IllegalStateException("No active call found with ID: $callId")
+            val activeCall = connections[callId]
+                ?: throw IllegalStateException("No active call found with ID: $callId")
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 if (!hasPermission(android.Manifest.permission.ANSWER_PHONE_CALLS)) {
@@ -106,7 +150,7 @@ actual class CallManager actual constructor(
             connections.remove(callId)
             CallResult.Success(Unit)
         } catch (e: SecurityException) {
-            CallResult.Error(CallError.PermissionDenied(e.message ?: "Permission denied"))
+            CallResult.Error(CallError.PermissionDenied(e.message ?: "io.jadu.ringlr.permissionUtils.Permission denied"))
         } catch (e: Exception) {
             CallResult.Error(CallError.ServiceError("Failed to end call: ${e.message}", -1))
         }
@@ -118,7 +162,8 @@ actual class CallManager actual constructor(
 
     actual override suspend fun muteCall(callId: String, muted: Boolean): CallResult<Unit> {
         return try {
-            val activeCall = connections[callId] ?: throw IllegalStateException("No active call found with ID: $callId")
+            val activeCall = connections[callId]
+                ?: throw IllegalStateException("No active call found with ID: $callId")
 
             if (!hasPermission(android.Manifest.permission.MODIFY_PHONE_STATE)) {
                 return CallResult.Error(CallError.PermissionDenied("MODIFY_PHONE_STATE permission not granted"))
@@ -143,12 +188,11 @@ actual class CallManager actual constructor(
             }
             CallResult.Success(Unit)
         } catch (e: SecurityException) {
-            CallResult.Error(CallError.PermissionDenied(e.message ?: "Permission denied"))
+            CallResult.Error(CallError.PermissionDenied(e.message ?: "io.jadu.ringlr.permissionUtils.Permission denied"))
         } catch (e: Exception) {
             CallResult.Error(CallError.ServiceError("Failed to mute call: ${e.message}", -1))
         }
     }
-
 
 
     actual override suspend fun holdCall(
@@ -156,7 +200,8 @@ actual class CallManager actual constructor(
         onHold: Boolean
     ): CallResult<Unit> {
         return try {
-            val activeCall = connections[callId] ?: throw IllegalStateException("No active call found with ID: $callId")
+            val activeCall = connections[callId]
+                ?: throw IllegalStateException("No active call found with ID: $callId")
 
             if (!hasPermission(android.Manifest.permission.MODIFY_PHONE_STATE)) {
                 return CallResult.Error(CallError.PermissionDenied("MODIFY_PHONE_STATE permission not granted"))
@@ -169,7 +214,7 @@ actual class CallManager actual constructor(
             }
             CallResult.Success(Unit)
         } catch (e: SecurityException) {
-            CallResult.Error(CallError.PermissionDenied(e.message ?: "Permission denied"))
+            CallResult.Error(CallError.PermissionDenied(e.message ?: "io.jadu.ringlr.permissionUtils.Permission denied"))
         } catch (e: Exception) {
             CallResult.Error(CallError.ServiceError("Failed to hold call: ${e.message}", -1))
         }
@@ -177,7 +222,8 @@ actual class CallManager actual constructor(
 
     actual override suspend fun getCallState(callId: String): CallResult<CallState> {
         return try {
-            val activeCall = connections[callId] ?: throw IllegalStateException("No active call found with ID: $callId")
+            val activeCall = connections[callId]
+                ?: throw IllegalStateException("No active call found with ID: $callId")
 
             val state = when (activeCall.state) {
                 Connection.STATE_INITIALIZING -> CallState.DIALING
@@ -238,10 +284,20 @@ actual class CallManager actual constructor(
                     if (success) {
                         CallResult.Success(Unit)
                     } else {
-                        CallResult.Error(CallError.ServiceError("Failed to set communication device", -1))
+                        CallResult.Error(
+                            CallError.ServiceError(
+                                "Failed to set communication device",
+                                -1
+                            )
+                        )
                     }
                 } else {
-                    CallResult.Error(CallError.ServiceError("Preferred device not found for the selected route", -1))
+                    CallResult.Error(
+                        CallError.ServiceError(
+                            "Preferred device not found for the selected route",
+                            -1
+                        )
+                    )
                 }
             } else {
                 when (route) {
@@ -250,7 +306,12 @@ actual class CallManager actual constructor(
                     AudioRoute.BLUETOOTH -> audioManager.startBluetoothSco()
                     AudioRoute.WIRED_HEADSET -> {
                         // No direct method to switch to wired headset; usually handled automatically
-                        CallResult.Error(CallError.ServiceError("Manual routing to wired headset is not supported on this API level", -1))
+                        CallResult.Error(
+                            CallError.ServiceError(
+                                "Manual routing to wired headset is not supported on this API level",
+                                -1
+                            )
+                        )
                     }
                 }
                 CallResult.Success(Unit)
@@ -259,7 +320,6 @@ actual class CallManager actual constructor(
             CallResult.Error(CallError.ServiceError("Failed to set audio route: ${e.message}", -1))
         }
     }
-
 
 
     actual override suspend fun getCurrentAudioRoute(): CallResult<AudioRoute> {
@@ -286,22 +346,75 @@ actual class CallManager actual constructor(
             }
             CallResult.Success(route)
         } catch (e: Exception) {
-            CallResult.Error(CallError.ServiceError("Failed to get current audio route: ${e.message}", -1))
+            CallResult.Error(
+                CallError.ServiceError(
+                    "Failed to get current audio route: ${e.message}",
+                    -1
+                )
+            )
         }
     }
 
     actual override suspend fun checkPermissions(): CallResult<Unit> {
+        return CallResult.Success(Unit)
+    }
+
+    /*actual override suspend fun checkPermissions(): CallResult<Unit> {
         val permission = android.Manifest.permission.CALL_PHONE
+        val activity = MainActivity.instance
+
         return try {
-            if (context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
-                CallResult.Success(Unit)
-            } else {
-                CallResult.Error(CallError.PermissionDenied("Permission denied: $permission"))
+            if (activity == null) {
+                Log.e("io.jadu.ringlr.permissionUtils.Permission", "Activity is null")  // Add logging
+                return CallResult.Error(CallError.ServiceError("Activity is null", -1))
+            }
+
+            when {
+                ActivityCompat.checkSelfPermission(
+                    activity,
+                    permission
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    CallResult.Success(Unit)
+                }
+
+                else -> {
+                    // Request permission directly here instead of separate function
+                    ActivityCompat.requestPermissions(
+                        activity,
+                        arrayOf(permission),
+                        PHONE_PERMISSION_REQUEST_CODE
+                    )
+                    CallResult.Error(CallError.PermissionDenied("io.jadu.ringlr.permissionUtils.Permission needs to be requested"))
+                }
             }
         } catch (e: Exception) {
-            CallResult.Error(CallError.ServiceError("Failed to check permissions: ${e.message}", -1))
+            Log.e("io.jadu.ringlr.permissionUtils.Permission", "Error: ${e.message}")  // Add logging
+            CallResult.Error(
+                CallError.ServiceError(
+                    "Failed to check permissions: ${e.message}",
+                    -1
+                )
+            )
         }
     }
+
+    companion object {
+        private const val PHONE_PERMISSION_REQUEST_CODE = 100
+    }*/
+
+
+    /*    private fun requestCallPermission() {
+            val permission = android.Manifest.permission.CALL_PHONE
+
+            if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    ,
+                    arrayOf(permission),
+                    PHONE_PERMISSION_REQUEST_CODE
+                )
+            }
+        }*/
+
 
     actual override fun registerCallStateCallback(callback: CallStateCallback) {
         callStateCallbacks.add(callback)
@@ -312,3 +425,5 @@ actual class CallManager actual constructor(
     }
 
 }
+
+

@@ -2,7 +2,7 @@ package io.jadu.ringlr.callHandler
 
 import io.jadu.ringlr.configs.AudioRoute
 import io.jadu.ringlr.configs.Call
-import io.jadu.ringlr.configs.CallManager
+import io.jadu.ringlr.configs.CallManagerInterface
 import io.jadu.ringlr.configs.CallResult
 import io.jadu.ringlr.configs.CallState
 import io.jadu.ringlr.configs.CallStateCallback
@@ -15,10 +15,17 @@ import io.jadu.ringlr.configs.CallStateCallback
 expect class PlatformConfiguration {
 
     // Platform-specific initialization
-    fun initialize()
+    fun initializeCallConfiguration()
+
+    // Custom Call Configuration
+    fun initializeCustomCallConfiguration(setHighlightColor:Int, setDescription:String, setSupportedUriSchemes:List<String>)
 
     // Platform-specific cleanup
-    fun cleanup()
+    fun cleanupCallConfiguration()
+
+    companion object {
+        fun create(): PlatformConfiguration
+    }
 }
 
 
@@ -28,10 +35,10 @@ expect class PlatformConfiguration {
  * iOS: Implements using CallKit
  */
 expect class CallManager(configuration: PlatformConfiguration) :
-    CallManager {
+    CallManagerInterface {
 
     // Call State Management
-    override suspend fun startOutgoingCall(number: String, displayName: String): CallResult<Call>
+    override suspend fun startOutgoingCall(number: String, displayName: String,scheme:String): CallResult<Call>
     override suspend fun endCall(callId: String): CallResult<Unit>
     override suspend fun muteCall(callId: String, muted: Boolean): CallResult<Unit>
     override suspend fun holdCall(callId: String, onHold: Boolean): CallResult<Unit>
@@ -44,7 +51,7 @@ expect class CallManager(configuration: PlatformConfiguration) :
     override suspend fun setAudioRoute(route: AudioRoute): CallResult<Unit>
     override suspend fun getCurrentAudioRoute(): CallResult<AudioRoute>
 
-    // Permission Management
+    // io.jadu.ringlr.permissionUtils.Permission Management
     override suspend fun checkPermissions(): CallResult<Unit>
 
     // Callback Registration

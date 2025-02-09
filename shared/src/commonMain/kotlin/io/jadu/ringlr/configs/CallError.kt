@@ -5,7 +5,7 @@ package io.jadu.ringlr.configs
  * This sealed class hierarchy provides type-safe error handling across platforms.
  */
 sealed class CallError : Exception() {
-    // Permission-related errors
+    // io.jadu.ringlr.permissionUtils.Permission-related errors
     data class PermissionDenied(override val message: String) : CallError()
     data class MissingPermission(val permission: String) : CallError()
 

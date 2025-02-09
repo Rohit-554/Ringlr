@@ -2,7 +2,7 @@ package io.jadu.ringlr.callHandler
 
 import io.jadu.ringlr.configs.AudioRoute
 import io.jadu.ringlr.configs.Call
-import io.jadu.ringlr.configs.CallManager
+import io.jadu.ringlr.configs.CallManagerInterface
 import io.jadu.ringlr.configs.CallResult
 import io.jadu.ringlr.configs.CallState
 import io.jadu.ringlr.configs.CallStateCallback
@@ -13,10 +13,24 @@ import io.jadu.ringlr.configs.CallStateCallback
  * iOS: Will contain CallKit and AVAudioSession configurations
  */
 actual class PlatformConfiguration {
-    actual fun initialize() {
+
+    actual fun cleanupCallConfiguration() {
     }
 
-    actual fun cleanup() {
+    actual companion object {
+        actual fun create(): PlatformConfiguration {
+            TODO("Not yet implemented")
+        }
+    }
+
+    actual fun initializeCustomCallConfiguration(
+        setHighlightColor: Int,
+        setDescription: String,
+        setSupportedUriSchemes: List<String>
+    ) {
+    }
+
+    actual fun initializeCallConfiguration() {
     }
 
 }
@@ -26,7 +40,7 @@ actual class PlatformConfiguration {
  * Android: Implements using Telecom framework
  * iOS: Implements using CallKit
  */
-actual class CallManager : CallManager {
+actual class CallManager : CallManagerInterface {
     actual constructor(configuration: PlatformConfiguration) {
         TODO("Not yet implemented")
     }
@@ -37,6 +51,14 @@ actual class CallManager : CallManager {
     ): CallResult<Call> {
         TODO("Not yet implemented")
     }
+
+    override suspend fun startCustomOutgoingCall(
+        number: String,
+        displayName: String
+    ): CallResult<Call> {
+        TODO("Not yet implemented")
+    }
+
 
     actual override suspend fun endCall(callId: String): CallResult<Unit> {
         TODO("Not yet implemented")

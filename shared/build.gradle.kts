@@ -2,8 +2,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.kotlinCocoapods)
+    //alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.androidLibrary)
+    //id("org.jetbrains.kotlin.plugin.compose")
 }
 
 kotlin {
@@ -20,7 +21,7 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    cocoapods {
+    /*cocoapods {
         summary = "Some description for the Shared Module"
         homepage = "Link to the Shared Module homepage"
         version = "1.0"
@@ -29,21 +30,22 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-    }
+    }*/
     
     sourceSets {
         androidMain.dependencies {
             implementation (libs.koin.android)
+            implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            //put your multiplatform dependencies here
+            implementation("org.jetbrains.compose.runtime:runtime:1.7.3")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
         getByName("commonMain") {
             dependencies {
-                implementation(libs.kotlinx.coroutines.core)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
             }
         }
     }
