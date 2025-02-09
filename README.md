@@ -2,7 +2,8 @@
 
 Ringlr is a cross-platform application designed to handle and integrate phone calls and audio configurations. It leverages platform-specific APIs such as Android's Telecom framework and iOS's CallKit to provide a seamless calling experience.
 
-![ringlr](https://github.com/user-attachments/assets/1df0dea1-95c2-47d8-af69-4cb26c9f2c3d)
+![ringlr_](https://github.com/user-attachments/assets/65f924e5-8f70-4bd1-87a5-a99eac86eae7)
+
 
 ## Features
 
