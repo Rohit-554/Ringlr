@@ -6,6 +6,7 @@ Ringlr is a cross-platform application designed to handle and integrate phone ca
 
 ## Contents
 - [Features](#features)
+- [Upcoming Changes](#upcoming-changes-and-work-left)
 - [Permissions](#permissions)
 - [CallManager API Reference](#callmanager-api-reference)
   - [Class Declaration](#class-declaration)
@@ -28,6 +29,7 @@ Ringlr is a cross-platform application designed to handle and integrate phone ca
 - [Important Notes](#important-notes)
 - [Troubleshooting](#troubleshooting)
 - [Building the Project](#building-the-project)
+  
 
 ## Features
 
@@ -36,6 +38,10 @@ Ringlr is a cross-platform application designed to handle and integrate phone ca
 - Manage call states (mute, hold, end)
 - Configure audio settings
 - Bluetooth support
+
+## Upcoming Changes and Work Left
+
+- Implementation on the ios side
 
 ## Permissions
 
@@ -179,7 +185,6 @@ callResult.onSuccess { call ->
 // Clean up
 callManager.unregisterCallStateCallback(callback)
 ```
-
 ## Getting Started
 
 ### Project Structure 
