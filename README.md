@@ -9,6 +9,12 @@ Ringlr is a cross-platform application designed to handle and integrate phone ca
 - [Upcoming Changes](#upcoming-changes-and-work-left)
 - [Contribution Guidelines](https://github.com/Rohit-554/Ringlr/blob/master/Contributing.md)
 - [Permissions](#permissions)
+- [Implementation Guide](#implementation-guide)
+  - [Local Library Integration](#local-library-integration)
+  - [Initialize the Library](#2-initialize-the-library)
+  - [Permission Handling](#3-permission-handling)
+  - [Making Calls](#4-making-calls)
+  - [Complete App.kt Example](#complete-appkt-example)
 - [CallManager API Reference](#callmanager-api-reference)
   - [Class Declaration](#class-declaration)
   - [Constructor Parameters](#constructor-parameters)
@@ -21,12 +27,6 @@ Ringlr is a cross-platform application designed to handle and integrate phone ca
 - [Getting Started](#getting-started)
   - [Project Structure](#project-structure)
   - [Installation](#installation)
-- [Implementation Guide](#implementation-guide)
-  - [Local Library Integration](#local-library-integration)
-  - [Initialize the Library](#2-initialize-the-library)
-  - [Permission Handling](#3-permission-handling)
-  - [Making Calls](#4-making-calls)
-  - [Complete App.kt Example](#complete-appkt-example)
 - [Important Notes](#important-notes)
 - [Troubleshooting](#troubleshooting)
 - [Building the Project](#building-the-project)
@@ -40,9 +40,15 @@ Ringlr is a cross-platform application designed to handle and integrate phone ca
 - Configure audio settings
 - Bluetooth support
 
-## Upcoming Changes and Work Left
+# Upcoming Changes and Work Left
 
-- Implementation on the ios side
+## In Progress
+- ✨ Writing actual classes for Ios
+
+## Coming Soon
+- ✨ VoIP support
+- ✨ Custom in-app calling
+- ✨ Publishing on Maven Central
 
 ## Permissions
 
