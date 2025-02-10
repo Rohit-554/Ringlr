@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     //alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.androidLibrary)
-    //id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.compose") version libs.versions.kotlin
 }
 
 kotlin {
@@ -12,7 +12,8 @@ kotlin {
         compilations.all {
             compileTaskProvider.configure {
                 compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_1_8)
+                    jvmTarget.set(JvmTarget.JVM_19)
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
                 }
             }
         }
@@ -31,7 +32,7 @@ kotlin {
             isStatic = true
         }
     }*/
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation (libs.koin.android)
@@ -58,7 +59,7 @@ android {
         minSdk = 24
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_19
+        targetCompatibility = JavaVersion.VERSION_19
     }
 }
