@@ -38,9 +38,8 @@ This project and everyone participating in it is governed by our Code of Conduct
 1. Update the README.md with details of changes if needed
 2. Add any new dependencies to the build files
 3. Update the documentation
-4. The PR must pass all CI checks
-5. Get at least one code review from a maintainer
-6. Once approved, a maintainer will merge your PR
+4. Get at least one code review from a maintainer
+5. Once approved, a maintainer will merge your PR
 
 ## Coding Standards
 
