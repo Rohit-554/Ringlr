@@ -19,7 +19,7 @@ This project and everyone participating in it is governed by our Code of Conduct
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/yourusername/ringlr.git`
+2. Clone your fork: `git clone https://github.com/Rohit-554/ringlr.git`
 3. Create a new branch: `git checkout -b feature/your-feature-name`
 4. Make your changes
 5. Test your changes thoroughly
@@ -68,14 +68,6 @@ suspend fun setAudioRoute(route: AudioRoute): CallResult<Unit> {
 }
 ```
 
-## Testing Guidelines
-
-- Write unit tests for all new features
-- Include integration tests where appropriate
-- Test edge cases and error conditions
-- Maintain test coverage above 80%
-- Use meaningful test names
-
 ## Documentation
 
 - Update API documentation for any changed code
@@ -84,19 +76,13 @@ suspend fun setAudioRoute(route: AudioRoute): CallResult<Unit> {
 - Add comments explaining complex algorithms
 - Document any breaking changes
 
-## Community
-
-- Join our Discord server for discussions
-- Follow our Twitter for updates
-- Subscribe to our newsletter
-- Attend our monthly community calls
 
 ## Need Help?
 
 If you need help with anything:
 1. Check the documentation
 2. Search existing issues
-3. Ask in our Discord channel
-4. Create a new issue
+3. Create a new issue
+4. Make a pull request
 
 Thank you for contributing to Ringlr! 🎉
