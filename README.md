@@ -7,6 +7,7 @@ Ringlr is a cross-platform application designed to handle and integrate phone ca
 ## Contents
 - [Features](#features)
 - [Upcoming Changes](#upcoming-changes-and-work-left)
+- [Contribution Guidelines](https://github.com/Rohit-554/Ringlr/blob/master/Contributing.md)
 - [Permissions](#permissions)
 - [CallManager API Reference](#callmanager-api-reference)
   - [Class Declaration](#class-declaration)
