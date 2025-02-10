@@ -40,12 +40,15 @@ Ringlr is a cross-platform application designed to handle and integrate phone ca
 - Configure audio settings
 - Bluetooth support
 
-## Upcoming Changes and Work Left
+# Upcoming Changes and Work Left
 
-✨ Writing actual classes for Ios
-✨ VoIP support
-✨ Custom in-app calling
-✨ Publishing on Maven Central
+## In Progress
+- ✨ Writing actual classes for Ios
+
+## Coming Soon
+- ✨ VoIP support
+- ✨ Custom in-app calling
+- ✨ Publishing on Maven Central
 
 ## Permissions
 
