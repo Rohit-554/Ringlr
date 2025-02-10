@@ -42,7 +42,10 @@ Ringlr is a cross-platform application designed to handle and integrate phone ca
 
 ## Upcoming Changes and Work Left
 
-- Implementation on the ios side
+✨ Writing actual classes for Ios
+✨ VoIP support
+✨ Custom in-app calling
+✨ Publishing on Maven Central
 
 ## Permissions
 
