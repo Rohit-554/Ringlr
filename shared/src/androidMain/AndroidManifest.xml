@@ -23,7 +23,7 @@
     <application android:name=".RinglrApp">
         <!-- Registration of our Connection Service -->
         <service
-            android:name=".callHandler.CallConnectionService"
+            android:name=".call.TelecomConnectionService"
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
             android:exported="true">
             <intent-filter>

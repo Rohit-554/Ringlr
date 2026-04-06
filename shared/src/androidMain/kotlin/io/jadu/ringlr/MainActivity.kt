@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import io.jadu.ringlr.callHandler.PlatformConfiguration
+import io.jadu.ringlr.call.PlatformConfiguration
 import org.koin.android.ext.android.inject
 
 class MainActivity:AppCompatActivity() {

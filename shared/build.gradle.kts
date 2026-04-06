@@ -2,64 +2,36 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    //alias(libs.plugins.kotlinCocoapods)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKmpLibrary)
     id("org.jetbrains.kotlin.plugin.compose") version libs.versions.kotlin
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_19)
-                    freeCompilerArgs.add("-Xexpect-actual-classes")
-                }
-            }
+    androidLibrary {
+        namespace = "io.jadu.ringlr"
+        compileSdk = 36
+        minSdk = 24
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
 
-    /*cocoapods {
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
-        version = "1.0"
-        ios.deploymentTarget = "16.0"
-        framework {
-            baseName = "shared"
-            isStatic = true
-        }
-    }*/
-
     sourceSets {
         androidMain.dependencies {
-            implementation (libs.koin.android)
+            implementation(libs.koin.android)
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            implementation("org.jetbrains.compose.runtime:runtime:1.7.3")
+            implementation(libs.compose.multiplatform.runtime)
+            implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-        getByName("commonMain") {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
-            }
-        }
-    }
-}
-
-android {
-    namespace = "io.jadu.ringlr"
-    compileSdk = 35
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_19
-        targetCompatibility = JavaVersion.VERSION_19
     }
 }

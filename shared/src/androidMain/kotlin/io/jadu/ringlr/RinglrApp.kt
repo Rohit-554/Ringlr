@@ -1,8 +1,8 @@
 package io.jadu.ringlr
 
 import android.app.Application
-import io.jadu.ringlr.callHandler.PlatformConfiguration
-import io.jadu.ringlr.module.appModule
+import io.jadu.ringlr.call.PlatformConfiguration
+import io.jadu.ringlr.di.ringlrModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -12,7 +12,7 @@ class RinglrApp: Application() {
         PlatformConfiguration.init(this)
         startKoin {
             androidContext(this@RinglrApp)
-            modules(appModule)
+            modules(ringlrModule)
         }
     }
 }
