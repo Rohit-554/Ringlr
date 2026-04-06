@@ -7,7 +7,7 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "io.jadu.ringlr"
         compileSdk = 36
         minSdk = 24
