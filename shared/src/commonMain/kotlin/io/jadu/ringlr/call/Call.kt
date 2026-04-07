@@ -1,12 +1,10 @@
 package io.jadu.ringlr.call
 
 /**
- * Represents a call in the system with its associated properties.
- * @property id Unique identifier for the call
- * @property number The phone number associated with the call
- * @property displayName The display name of the contact if available
- * @property state Current state of the call
- * @property createdAt Timestamp when the call was created
+ * Immutable snapshot of a call at a point in time.
+ *
+ * Every state change produces a new [Call] instance. The [id] maps to the
+ * platform call handle — NSUUID string on iOS, connection tag on Android.
  */
 data class Call(
     val id: String,

@@ -212,6 +212,7 @@ actual class CallManager actual constructor(
         }
     }
 
+    @Suppress("NewApi")
     private fun setAudioRouteModern(audioManager: AudioManager, route: AudioRoute): CallResult<Unit> {
         val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
         val preferredDevice = when (route) {
@@ -256,6 +257,7 @@ actual class CallManager actual constructor(
         }
     }
 
+    @Suppress("NewApi")
     private fun resolveAudioRouteModern(audioManager: AudioManager): AudioRoute {
         return when (audioManager.communicationDevice?.type) {
             AudioDeviceInfo.TYPE_BUILTIN_SPEAKER -> AudioRoute.SPEAKER

@@ -1,20 +1,17 @@
 package io.jadu.ringlr.call
 
-
 /**
- * Expected platform-specific configuration class that holds essential platform settings.
- * Android: Will contain Context and necessary Android-specific configurations
- * iOS: Will contain CallKit and AVAudioSession configurations
+ * Holds the platform-specific runtime dependencies needed to initialise the calling stack.
+ *
+ * On Android this wraps TelecomManager and handles phone account registration.
+ * On iOS this owns the single CXProvider and AVAudioSession required by CallKit.
+ *
+ * Always create via [PlatformConfiguration.create] and call [initializeCallConfiguration]
+ * before constructing a [CallManager].
  */
 expect class PlatformConfiguration {
-
-    // Platform-specific initialization
     fun initializeCallConfiguration()
-
-    // Custom Call Configuration
-    fun initializeCustomCallConfiguration(setHighlightColor:Int, setDescription:String, setSupportedUriSchemes:List<String>)
-
-    // Platform-specific cleanup
+    fun initializeCustomCallConfiguration(setHighlightColor: Int, setDescription: String, setSupportedUriSchemes: List<String>)
     fun cleanupCallConfiguration()
 
     companion object {
@@ -22,33 +19,26 @@ expect class PlatformConfiguration {
     }
 }
 
-
 /**
- * Expected CallManager implementation that bridges to platform-specific calling APIs.
- * Android: Implements using Telecom framework
- * iOS: Implements using CallKit
+ * Entry point for all call operations in Ringlr.
+ *
+ * Bridges the shared [CallManagerInterface] to the platform calling API —
+ * Android Telecom on Android, CallKit on iOS. Construct with a fully
+ * initialised [PlatformConfiguration].
+ *
+ * All suspend functions are safe to call from any coroutine context.
+ * Register a [CallStateCallback] to receive real-time call lifecycle events.
  */
-expect class CallManager(configuration: PlatformConfiguration) :
-    CallManagerInterface {
-
-    // Call State Management
-    override suspend fun startOutgoingCall(number: String, displayName: String,scheme:String): CallResult<Call>
+expect class CallManager(configuration: PlatformConfiguration) : CallManagerInterface {
+    override suspend fun startOutgoingCall(number: String, displayName: String, scheme: String): CallResult<Call>
     override suspend fun endCall(callId: String): CallResult<Unit>
     override suspend fun muteCall(callId: String, muted: Boolean): CallResult<Unit>
     override suspend fun holdCall(callId: String, onHold: Boolean): CallResult<Unit>
-
-    // Call Information
     override suspend fun getCallState(callId: String): CallResult<CallState>
     override suspend fun getActiveCalls(): CallResult<List<Call>>
-
-    // Audio Route Management
     override suspend fun setAudioRoute(route: AudioRoute): CallResult<Unit>
     override suspend fun getCurrentAudioRoute(): CallResult<AudioRoute>
-
-    // io.jadu.ringlr.permission.Permission Management
     override suspend fun checkPermissions(): CallResult<Unit>
-
-    // Callback Registration
     override fun registerCallStateCallback(callback: CallStateCallback)
     override fun unregisterCallStateCallback(callback: CallStateCallback)
 }

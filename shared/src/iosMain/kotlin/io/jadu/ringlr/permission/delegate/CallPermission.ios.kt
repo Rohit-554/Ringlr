@@ -2,14 +2,12 @@ package io.jadu.ringlr.permission.delegate
 
 import io.jadu.ringlr.permission.PermissionDelegate
 
-//TODO:: Implement this
-internal actual val callDelegate: PermissionDelegate
-    get() = TODO("Not yet implemented")
-internal actual val manageCallDelegate: PermissionDelegate
-    get() = TODO("Not yet implemented")
-internal actual val readPhoneStateDelegate: PermissionDelegate
-    get() = TODO("Not yet implemented")
-internal actual val answerPhoneCallDelegate: PermissionDelegate
-    get() = TODO("Not yet implemented")
-internal actual val readPhoneNumbersDelegate: PermissionDelegate
-    get() = TODO("Not yet implemented")
+/**
+ * iOS has no runtime equivalents for Android's telephony permissions.
+ * CallKit manages call access at the system level — no grant needed from the app.
+ */
+internal actual val callDelegate: PermissionDelegate get() = AlwaysGrantedDelegate
+internal actual val manageCallDelegate: PermissionDelegate get() = AlwaysGrantedDelegate
+internal actual val readPhoneStateDelegate: PermissionDelegate get() = AlwaysGrantedDelegate
+internal actual val answerPhoneCallDelegate: PermissionDelegate get() = AlwaysGrantedDelegate
+internal actual val readPhoneNumbersDelegate: PermissionDelegate get() = AlwaysGrantedDelegate

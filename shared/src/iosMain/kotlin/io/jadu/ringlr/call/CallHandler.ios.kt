@@ -1,20 +1,37 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+
 package io.jadu.ringlr.call
 
+import io.jadu.ringlr.call.callkit.ActiveCallRegistry
+import io.jadu.ringlr.call.callkit.CallActionDispatcher
+import io.jadu.ringlr.call.callkit.CallAudioRouter
+import io.jadu.ringlr.call.callkit.SystemCallBridge
+import platform.CallKit.CXEndCallAction
+import platform.CallKit.CXHandle
+import platform.CallKit.CXHandleTypePhoneNumber
+import platform.CallKit.CXSetHeldCallAction
+import platform.CallKit.CXSetMutedCallAction
+import platform.CallKit.CXStartCallAction
+import platform.CallKit.CXTransaction
+import platform.Foundation.NSUUID
+import platform.posix.time
 
-/**
- * Expected platform-specific configuration class that holds essential platform settings.
- * Android: Will contain Context and necessary Android-specific configurations
- * iOS: Will contain CallKit and AVAudioSession configurations
- */
-actual class PlatformConfiguration {
+actual class PlatformConfiguration private constructor() {
 
-    actual fun cleanupCallConfiguration() {
-    }
+    internal val registry = ActiveCallRegistry()
+    internal val audioRouter = CallAudioRouter()
+    internal val callObservers = mutableListOf<CallStateCallback>()
 
-    actual companion object {
-        actual fun create(): PlatformConfiguration {
-            TODO("Not yet implemented")
-        }
+    internal lateinit var systemBridge: SystemCallBridge
+        private set
+
+    internal lateinit var actionDispatcher: CallActionDispatcher
+        private set
+
+    actual fun initializeCallConfiguration() {
+        systemBridge = SystemCallBridge(registry, callObservers)
+        actionDispatcher = CallActionDispatcher()
+        audioRouter.activate()
     }
 
     actual fun initializeCustomCallConfiguration(
@@ -22,73 +39,107 @@ actual class PlatformConfiguration {
         setDescription: String,
         setSupportedUriSchemes: List<String>
     ) {
+        if (!::systemBridge.isInitialized) initializeCallConfiguration()
     }
 
-    actual fun initializeCallConfiguration() {
+    actual fun cleanupCallConfiguration() {
+        if (::systemBridge.isInitialized) systemBridge.provider.invalidate()
+        audioRouter.deactivate()
     }
 
+    actual companion object {
+        actual fun create(): PlatformConfiguration = PlatformConfiguration()
+    }
 }
 
-/**
- * Expected CallManager implementation that bridges to platform-specific calling APIs.
- * Android: Implements using Telecom framework
- * iOS: Implements using CallKit
- */
-actual class CallManager : CallManagerInterface {
-    actual constructor(configuration: PlatformConfiguration) {
-        TODO("Not yet implemented")
-    }
+actual class CallManager actual constructor(
+    private val configuration: PlatformConfiguration
+) : CallManagerInterface {
+
+    private val registry get() = configuration.registry
+    private val audioRouter get() = configuration.audioRouter
+    private val observers get() = configuration.callObservers
+    private val dispatcher get() = configuration.actionDispatcher
 
     actual override suspend fun startOutgoingCall(
         number: String,
         displayName: String,
         scheme: String
-    ): CallResult<Call> {
-        TODO("Not yet implemented")
-    }
+    ): CallResult<Call> = runCatching {
+        val uuid = NSUUID()
+        val call = newCall(uuid, number, displayName)
+        registry.register(call, uuid)
+        observers.forEach { it.onCallAdded(call) }
+        dispatcher.dispatch(startTransaction(uuid, number, displayName))
+        call
+    }.toCallResult()
 
-    actual override suspend fun endCall(callId: String): CallResult<Unit> {
-        TODO("Not yet implemented")
-    }
+    actual override suspend fun endCall(callId: String): CallResult<Unit> = runCatching {
+        val uuid = registry.uuidFor(callId) ?: throw CallError.CallNotFound(callId)
+        dispatcher.dispatch(CXTransaction(action = CXEndCallAction(callUUID = uuid)))
+    }.toCallResult()
 
-    actual override suspend fun muteCall(
-        callId: String,
-        muted: Boolean
-    ): CallResult<Unit> {
-        TODO("Not yet implemented")
-    }
+    actual override suspend fun muteCall(callId: String, muted: Boolean): CallResult<Unit> = runCatching {
+        val uuid = registry.uuidFor(callId) ?: throw CallError.CallNotFound(callId)
+        dispatcher.dispatch(CXTransaction(action = CXSetMutedCallAction(callUUID = uuid, muted = muted)))
+    }.toCallResult()
 
-    actual override suspend fun holdCall(
-        callId: String,
-        onHold: Boolean
-    ): CallResult<Unit> {
-        TODO("Not yet implemented")
-    }
+    actual override suspend fun holdCall(callId: String, onHold: Boolean): CallResult<Unit> = runCatching {
+        val uuid = registry.uuidFor(callId) ?: throw CallError.CallNotFound(callId)
+        dispatcher.dispatch(CXTransaction(action = CXSetHeldCallAction(callUUID = uuid, onHold = onHold)))
+    }.toCallResult()
 
     actual override suspend fun getCallState(callId: String): CallResult<CallState> {
-        TODO("Not yet implemented")
+        val call = registry.findById(callId) ?: return CallResult.Error(CallError.CallNotFound(callId))
+        return CallResult.Success(call.state)
     }
 
-    actual override suspend fun getActiveCalls(): CallResult<List<Call>> {
-        TODO("Not yet implemented")
-    }
+    actual override suspend fun getActiveCalls(): CallResult<List<Call>> =
+        CallResult.Success(registry.allActive())
 
     actual override suspend fun setAudioRoute(route: AudioRoute): CallResult<Unit> {
-        TODO("Not yet implemented")
+        val routed = audioRouter.routeTo(route)
+        return if (routed) CallResult.Success(Unit)
+        else CallResult.Error(CallError.AudioDeviceError("Cannot route audio to $route"))
     }
 
-    actual override suspend fun getCurrentAudioRoute(): CallResult<AudioRoute> {
-        TODO("Not yet implemented")
-    }
+    actual override suspend fun getCurrentAudioRoute(): CallResult<AudioRoute> =
+        CallResult.Success(audioRouter.currentRoute())
 
-    actual override suspend fun checkPermissions(): CallResult<Unit> {
-        TODO("Not yet implemented")
-    }
+    actual override suspend fun checkPermissions(): CallResult<Unit> =
+        CallResult.Success(Unit)
 
     actual override fun registerCallStateCallback(callback: CallStateCallback) {
+        observers.add(callback)
     }
 
     actual override fun unregisterCallStateCallback(callback: CallStateCallback) {
+        observers.remove(callback)
     }
 
+    private fun newCall(uuid: NSUUID, number: String, displayName: String) = Call(
+        id = uuid.UUIDString,
+        number = number,
+        displayName = displayName,
+        state = CallState.DIALING,
+        createdAt = time(null)
+    )
+
+    private fun startTransaction(uuid: NSUUID, number: String, displayName: String): CXTransaction {
+        val handle = CXHandle(type = CXHandleTypePhoneNumber, value = number)
+        val action = CXStartCallAction(callUUID = uuid, handle = handle).apply {
+            contactIdentifier = displayName
+        }
+        return CXTransaction(action = action)
+    }
 }
+
+private fun <T> Result<T>.toCallResult(): CallResult<T> = fold(
+    onSuccess = { CallResult.Success(it) },
+    onFailure = { error ->
+        when (error) {
+            is CallError -> CallResult.Error(error)
+            else -> CallResult.Error(CallError.ServiceError(error.message ?: "Unexpected error", -1))
+        }
+    }
+)

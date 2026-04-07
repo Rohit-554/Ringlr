@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKmpLibrary)
-    id("org.jetbrains.kotlin.plugin.compose") version libs.versions.kotlin
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -28,6 +28,9 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(libs.compose.multiplatform.runtime)
+            implementation(libs.compose.multiplatform.ui)
+            implementation(libs.compose.multiplatform.foundation)
+            implementation(libs.compose.multiplatform.material3)
             implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
