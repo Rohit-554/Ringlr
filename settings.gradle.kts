@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Ringlr"
 include(":shared")
+include(":demoApp")

@@ -1,8 +1,10 @@
 package io.jadu.ringlr.call
 
-
 /**
- * Interface for receiving updates about call state changes.
+ * Receives real-time call lifecycle events from [CallManager].
+ *
+ * Register via [CallManagerInterface.registerCallStateCallback] and always
+ * unregister when done to avoid memory leaks.
  */
 interface CallStateCallback {
     fun onCallStateChanged(call: Call)

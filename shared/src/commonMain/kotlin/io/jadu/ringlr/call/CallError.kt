@@ -1,23 +1,19 @@
 package io.jadu.ringlr.call
 
 /**
- * Represents possible errors that can occur during call operations.
- * This sealed class hierarchy provides type-safe error handling across platforms.
+ * Represents every failure case that can arise during a call operation.
+ *
+ * Extends [Exception] so it can be thrown inside coroutines and caught
+ * naturally, while still being returnable inside [CallResult.Error] for
+ * callers that prefer result-style error handling.
  */
 sealed class CallError : Exception() {
-    // io.jadu.ringlr.permission.Permission-related errors
     data class PermissionDenied(override val message: String) : CallError()
-    data class MissingPermission(val permission: String) : CallError()
-
-    // Call state errors
+    data class MissingPermission(val permissionName: String) : CallError()
     data class InvalidCallState(val currentState: CallState, val requestedOperation: String) : CallError()
     data class CallNotFound(val callId: String) : CallError()
-
-    // Device/hardware errors
     data class AudioDeviceError(override val message: String) : CallError()
     data class NetworkError(override val message: String) : CallError()
-
-    // Service errors
     data class ServiceNotInitialized(override val message: String) : CallError()
     data class ServiceError(override val message: String, val code: Int) : CallError()
 }
