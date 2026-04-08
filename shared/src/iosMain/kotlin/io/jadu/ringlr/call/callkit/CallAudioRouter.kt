@@ -1,73 +1,55 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+
 package io.jadu.ringlr.call.callkit
 
 import io.jadu.ringlr.call.AudioRoute
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
-import platform.AVFAudio.AVAudioSessionPortBluetoothA2DP
-import platform.AVFAudio.AVAudioSessionPortBluetoothHFP
-import platform.AVFAudio.AVAudioSessionPortBuiltInSpeaker
-import platform.AVFAudio.AVAudioSessionPortDescription
-import platform.AVFAudio.AVAudioSessionPortHeadphones
 import platform.AVFAudio.AVAudioSessionPortOverrideNone
 import platform.AVFAudio.AVAudioSessionPortOverrideSpeaker
 
 /**
  * Routes audio output for an active call using AVAudioSession.
  *
- * The session must be active (CallKit activates it automatically during a call
- * via provider(_:didActivate:)) before routing calls are meaningful.
+ * CallKit activates and deactivates the audio session automatically via
+ * [CXProviderDelegate.provider(_:didActivate:)] and
+ * [CXProviderDelegate.provider(_:didDeactivate:)]. This class only
+ * configures the session category and manages the speaker override —
+ * it does not call setActive directly.
+ *
+ * For Bluetooth and wired headset routing, iOS routes automatically to
+ * any connected device when the speaker override is removed. Apps that
+ * need fine-grained Bluetooth control should use [AVRoutePickerView].
  */
 internal class CallAudioRouter {
 
     private val session: AVAudioSession get() = AVAudioSession.sharedInstance()
+    private var activeRoute: AudioRoute = AudioRoute.EARPIECE
 
     fun activate() {
         session.setCategory(AVAudioSessionCategoryPlayAndRecord, error = null)
-        session.setActive(true, error = null)
     }
 
     fun deactivate() {
-        session.setActive(false, error = null)
+        activeRoute = AudioRoute.EARPIECE
     }
 
-    fun routeTo(destination: AudioRoute): Boolean = when (destination) {
+    fun routeTo(destination: AudioRoute): Boolean {
+        val success = applyRoute(destination)
+        if (success) activeRoute = destination
+        return success
+    }
+
+    fun currentRoute(): AudioRoute = activeRoute
+
+    private fun applyRoute(destination: AudioRoute): Boolean = when (destination) {
         AudioRoute.SPEAKER -> overrideToSpeaker()
-        AudioRoute.EARPIECE -> overrideToEarpiece()
-        AudioRoute.BLUETOOTH -> routeToBluetoothHeadset()
-        AudioRoute.WIRED_HEADSET -> routeToWiredHeadset()
-    }
-
-    fun currentRoute(): AudioRoute {
-        val outputs = session.currentRoute.outputs.filterIsInstance<AVAudioSessionPortDescription>()
-        return when {
-            outputs.any { it.portType == AVAudioSessionPortBuiltInSpeaker } -> AudioRoute.SPEAKER
-            outputs.any { it.isBluetooth() } -> AudioRoute.BLUETOOTH
-            outputs.any { it.portType == AVAudioSessionPortHeadphones } -> AudioRoute.WIRED_HEADSET
-            else -> AudioRoute.EARPIECE
-        }
+        AudioRoute.EARPIECE, AudioRoute.BLUETOOTH, AudioRoute.WIRED_HEADSET -> removeOverride()
     }
 
     private fun overrideToSpeaker(): Boolean =
         session.overrideOutputAudioPort(AVAudioSessionPortOverrideSpeaker, error = null)
 
-    private fun overrideToEarpiece(): Boolean =
+    private fun removeOverride(): Boolean =
         session.overrideOutputAudioPort(AVAudioSessionPortOverrideNone, error = null)
-
-    private fun routeToBluetoothHeadset(): Boolean {
-        val port = findInput(AVAudioSessionPortBluetoothHFP) ?: return false
-        return session.setPreferredInput(port, error = null)
-    }
-
-    private fun routeToWiredHeadset(): Boolean {
-        val port = findInput(AVAudioSessionPortHeadphones) ?: return false
-        return session.setPreferredInput(port, error = null)
-    }
-
-    private fun findInput(portType: String): AVAudioSessionPortDescription? =
-        session.availableInputs
-            ?.filterIsInstance<AVAudioSessionPortDescription>()
-            ?.firstOrNull { it.portType == portType }
-
-    private fun AVAudioSessionPortDescription.isBluetooth(): Boolean =
-        portType == AVAudioSessionPortBluetoothHFP || portType == AVAudioSessionPortBluetoothA2DP
 }

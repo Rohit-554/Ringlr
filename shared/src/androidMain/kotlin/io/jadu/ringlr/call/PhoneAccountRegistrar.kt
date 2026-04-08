@@ -3,6 +3,7 @@ package io.jadu.ringlr.call
 import android.content.ComponentName
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.telecom.PhoneAccount
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
@@ -70,6 +71,10 @@ class PhoneAccountRegistrar(private val context: Context) {
                     PhoneAccount.CAPABILITY_SUPPORTS_VIDEO_CALLING
         }
         return capabilities
+    }
+
+    internal fun addIncomingVoipCall(telecomManager: TelecomManager, extras: Bundle) {
+        telecomManager.addNewIncomingCall(customAccountHandle, extras)
     }
 
     internal fun unregisterPhoneAccount(telecomManager: TelecomManager) {

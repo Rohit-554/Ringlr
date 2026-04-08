@@ -5,16 +5,20 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.net.Uri
+import android.net.sip.SipAudioCall
+import android.net.sip.SipException
+import android.net.sip.SipManager
 import android.os.Build
 import android.os.Bundle
 import android.telecom.CallAudioState
 import android.telecom.Connection
 import android.telecom.TelecomManager
 import android.telephony.DisconnectCause
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.util.UUID
+import kotlin.coroutines.resume
 
 actual class PlatformConfiguration(
     val context: Context
@@ -64,23 +68,65 @@ actual class CallManager actual constructor(
     private val registrar = PhoneAccountRegistrar(context)
     private val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
     private val connections = mutableMapOf<String, Connection>()
+    private val sipCalls = mutableMapOf<String, SipAudioCall>()
     private val callStateCallbacks = mutableSetOf<CallStateCallback>()
+
+    @Suppress("DEPRECATION")
+    private var activeSipManager: SipManager? = null
+
+    @Suppress("DEPRECATION")
+    private var activeSipProfile: android.net.sip.SipProfile? = null
+
+    actual override suspend fun configureSipAccount(profile: SipProfile): CallResult<Unit> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return CallResult.Error(CallError.SipUnsupported(
+                "Android dropped built-in SIP support in API 31 (Android 12) with no official replacement. " +
+                "Ringlr handles the Telecom UI layer — bring your own SIP/VoIP stack (e.g. Linphone, PJSIP, WebRTC) " +
+                "for signaling and media, then call startOutgoingCall() once your stack has established the session."
+            ))
+        }
+        return buildSipAccount(profile)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun buildSipAccount(profile: SipProfile): CallResult<Unit> {
+        if (!SipManager.isApiSupported(context)) {
+            return CallResult.Error(CallError.ServiceError("SIP API not supported on this device", -1))
+        }
+        return try {
+            val manager = SipManager.newInstance(context)
+                ?: return CallResult.Error(CallError.ServiceError("Failed to create SipManager", -1))
+            val localProfile = android.net.sip.SipProfile.Builder(profile.username, profile.server)
+                .setPassword(profile.password)
+                .setPort(profile.port)
+                .setDisplayName(profile.displayName)
+                .build()
+            activeSipManager = manager
+            activeSipProfile = localProfile
+            CallResult.Success(Unit)
+        } catch (e: Exception) {
+            CallResult.Error(CallError.ServiceError("Failed to configure SIP account: ${e.message}", -1))
+        }
+    }
 
     actual override suspend fun startOutgoingCall(
         number: String,
         displayName: String,
         scheme: String
+    ): CallResult<Call> {
+        return if (scheme == "sip") placeSipCall(number, displayName)
+        else placePstnCall(number, displayName, scheme)
+    }
+
+    private suspend fun placePstnCall(
+        number: String,
+        displayName: String,
+        scheme: String
     ): CallResult<Call> = withContext(Dispatchers.Main) {
         try {
-            val outgoingCallExtras = Bundle().apply {
-                putString("display_name", displayName)
-            }
-
+            val extras = Bundle().apply { putString("display_name", displayName) }
             val callScheme = scheme.ifEmpty { "tel" }
-            telecomManager.placeCall(
-                Uri.fromParts(callScheme, number, null),
-                outgoingCallExtras
-            )
+            telecomManager.placeCall(Uri.fromParts(callScheme, number, null), extras)
             val call = registrar.waitForCallEstablishment(number, context)
             CallResult.Success(call)
         } catch (e: SecurityException) {
@@ -90,7 +136,59 @@ actual class CallManager actual constructor(
         }
     }
 
+    @Suppress("DEPRECATION")
+    private suspend fun placeSipCall(number: String, displayName: String): CallResult<Call> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return CallResult.Error(CallError.SipUnsupported(
+                "SIP calling is not available on Android 12+. See configureSipAccount() for details."
+            ))
+        }
+        val sipManager = activeSipManager
+            ?: return CallResult.Error(CallError.ServiceNotInitialized("Call configureSipAccount before placing a SIP call"))
+        val localProfile = activeSipProfile
+            ?: return CallResult.Error(CallError.ServiceNotInitialized("SIP account not configured"))
+
+        val peerUri = resolvePeerUri(number, localProfile.sipDomain)
+        return suspendCancellableCoroutine { continuation ->
+            val callId = UUID.randomUUID().toString()
+            val listener = object : SipAudioCall.Listener() {
+                override fun onCallEstablished(sipCall: SipAudioCall) {
+                    sipCalls[callId] = sipCall
+                    val call = Call(
+                        id = callId,
+                        number = number,
+                        displayName = displayName,
+                        state = CallState.ACTIVE,
+                        createdAt = System.currentTimeMillis(),
+                        scheme = "sip"
+                    )
+                    callStateCallbacks.forEach { it.onCallAdded(call) }
+                    continuation.resume(CallResult.Success(call))
+                }
+
+                override fun onError(sipCall: SipAudioCall?, errorCode: Int, errorMessage: String?) {
+                    continuation.resume(CallResult.Error(
+                        CallError.ServiceError(errorMessage ?: "SIP call failed", errorCode)
+                    ))
+                }
+            }
+            try {
+                sipManager.makeAudioCall(localProfile.uriString, peerUri, listener, SIP_CALL_TIMEOUT_SECONDS)
+            } catch (e: SipException) {
+                continuation.resume(CallResult.Error(
+                    CallError.ServiceError("SIP call failed: ${e.message}", -1)
+                ))
+            }
+        }
+    }
+
+    private fun resolvePeerUri(number: String, sipDomain: String): String {
+        val isSipAddress = number.contains("@")
+        return if (isSipAddress) "sip:$number" else "sip:$number@$sipDomain"
+    }
+
     actual override suspend fun endCall(callId: String): CallResult<Unit> {
+        sipCalls[callId]?.let { return endSipCall(callId, it) }
         return try {
             val activeCall = connections[callId]
                 ?: return CallResult.Error(CallError.CallNotFound(callId))
@@ -108,6 +206,17 @@ actual class CallManager actual constructor(
             CallResult.Error(CallError.PermissionDenied(e.message ?: "Permission denied"))
         } catch (e: Exception) {
             CallResult.Error(CallError.ServiceError("Failed to end call: ${e.message}", -1))
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun endSipCall(callId: String, sipCall: SipAudioCall): CallResult<Unit> {
+        return try {
+            sipCall.endCall()
+            sipCalls.remove(callId)
+            CallResult.Success(Unit)
+        } catch (e: SipException) {
+            CallResult.Error(CallError.ServiceError("Failed to end SIP call: ${e.message}", -1))
         }
     }
 
@@ -283,6 +392,10 @@ actual class CallManager actual constructor(
 
     actual override fun unregisterCallStateCallback(callback: CallStateCallback) {
         callStateCallbacks.remove(callback)
+    }
+
+    companion object {
+        private const val SIP_CALL_TIMEOUT_SECONDS = 30
     }
 }
 

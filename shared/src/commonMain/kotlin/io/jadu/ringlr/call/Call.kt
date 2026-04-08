@@ -11,5 +11,6 @@ data class Call(
     val number: String,
     val displayName: String,
     val state: CallState,
-    val createdAt: Long
+    val createdAt: Long,
+    val scheme: String = "tel"
 )

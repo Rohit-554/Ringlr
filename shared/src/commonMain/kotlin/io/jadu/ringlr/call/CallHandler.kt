@@ -38,6 +38,7 @@ expect class CallManager(configuration: PlatformConfiguration) : CallManagerInte
     override suspend fun getActiveCalls(): CallResult<List<Call>>
     override suspend fun setAudioRoute(route: AudioRoute): CallResult<Unit>
     override suspend fun getCurrentAudioRoute(): CallResult<AudioRoute>
+    override suspend fun configureSipAccount(profile: SipProfile): CallResult<Unit>
     override suspend fun checkPermissions(): CallResult<Unit>
     override fun registerCallStateCallback(callback: CallStateCallback)
     override fun unregisterCallStateCallback(callback: CallStateCallback)

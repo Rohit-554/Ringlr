@@ -8,6 +8,7 @@ import io.jadu.ringlr.call.callkit.CallAudioRouter
 import io.jadu.ringlr.call.callkit.SystemCallBridge
 import platform.CallKit.CXEndCallAction
 import platform.CallKit.CXHandle
+import platform.CallKit.CXHandleTypeGeneric
 import platform.CallKit.CXHandleTypePhoneNumber
 import platform.CallKit.CXSetHeldCallAction
 import platform.CallKit.CXSetMutedCallAction
@@ -60,6 +61,12 @@ actual class CallManager actual constructor(
     private val audioRouter get() = configuration.audioRouter
     private val observers get() = configuration.callObservers
     private val dispatcher get() = configuration.actionDispatcher
+    private var sipProfile: SipProfile? = null
+
+    actual override suspend fun configureSipAccount(profile: SipProfile): CallResult<Unit> {
+        sipProfile = profile
+        return CallResult.Success(Unit)
+    }
 
     actual override suspend fun startOutgoingCall(
         number: String,
@@ -67,10 +74,10 @@ actual class CallManager actual constructor(
         scheme: String
     ): CallResult<Call> = runCatching {
         val uuid = NSUUID()
-        val call = newCall(uuid, number, displayName)
+        val call = newCall(uuid, number, displayName, scheme)
         registry.register(call, uuid)
         observers.forEach { it.onCallAdded(call) }
-        dispatcher.dispatch(startTransaction(uuid, number, displayName))
+        dispatcher.dispatch(startTransaction(uuid, number, displayName, scheme))
         call
     }.toCallResult()
 
@@ -117,16 +124,19 @@ actual class CallManager actual constructor(
         observers.remove(callback)
     }
 
-    private fun newCall(uuid: NSUUID, number: String, displayName: String) = Call(
+    private fun newCall(uuid: NSUUID, number: String, displayName: String, scheme: String = "tel") = Call(
         id = uuid.UUIDString,
         number = number,
         displayName = displayName,
         state = CallState.DIALING,
-        createdAt = time(null)
+        createdAt = time(null),
+        scheme = scheme
     )
 
-    private fun startTransaction(uuid: NSUUID, number: String, displayName: String): CXTransaction {
-        val handle = CXHandle(type = CXHandleTypePhoneNumber, value = number)
+    private fun startTransaction(uuid: NSUUID, number: String, displayName: String, scheme: String): CXTransaction {
+        val handleType = if (scheme == "sip") CXHandleTypeGeneric else CXHandleTypePhoneNumber
+        val handleValue = if (scheme == "sip") "sip:$number" else number
+        val handle = CXHandle(type = handleType, value = handleValue)
         val action = CXStartCallAction(callUUID = uuid, handle = handle).apply {
             contactIdentifier = displayName
         }
