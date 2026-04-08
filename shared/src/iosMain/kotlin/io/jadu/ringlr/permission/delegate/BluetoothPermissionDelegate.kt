@@ -1,10 +1,11 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+
 package io.jadu.ringlr.permission.delegate
 
 import io.jadu.ringlr.permission.DeniedAlwaysException
 import io.jadu.ringlr.permission.DeniedException
 import io.jadu.ringlr.permission.PermissionDelegate
 import io.jadu.ringlr.permission.PermissionState
-import io.jadu.ringlr.permission.delegate.BluetoothPermission
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
@@ -13,9 +14,8 @@ import platform.CoreBluetooth.CBManagerAuthorizationAllowedAlways
 import platform.CoreBluetooth.CBManagerAuthorizationDenied
 import platform.CoreBluetooth.CBManagerAuthorizationNotDetermined
 import platform.CoreBluetooth.CBManagerAuthorizationRestricted
-import platform.Foundation.NSObject
+import platform.darwin.NSObject
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 /**
  * Requests and checks Bluetooth access via CBCentralManager (iOS 13+).

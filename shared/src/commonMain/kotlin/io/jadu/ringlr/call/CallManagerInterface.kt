@@ -21,6 +21,7 @@ interface CallManagerInterface {
     suspend fun getActiveCalls(): CallResult<List<Call>>
     suspend fun setAudioRoute(route: AudioRoute): CallResult<Unit>
     suspend fun getCurrentAudioRoute(): CallResult<AudioRoute>
+    suspend fun configureSipAccount(profile: SipProfile): CallResult<Unit>
     suspend fun checkPermissions(): CallResult<Unit>
     fun registerCallStateCallback(callback: CallStateCallback)
     fun unregisterCallStateCallback(callback: CallStateCallback)

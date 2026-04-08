@@ -1,3 +1,5 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+
 package io.jadu.ringlr.call.callkit
 
 import io.jadu.ringlr.call.Call
@@ -7,6 +9,7 @@ import platform.CallKit.CXAnswerCallAction
 import platform.CallKit.CXCallUpdate
 import platform.CallKit.CXEndCallAction
 import platform.CallKit.CXHandle
+import platform.CallKit.CXHandleTypeGeneric
 import platform.CallKit.CXHandleTypePhoneNumber
 import platform.CallKit.CXProvider
 import platform.CallKit.CXProviderConfiguration
@@ -14,8 +17,8 @@ import platform.CallKit.CXProviderDelegateProtocol
 import platform.CallKit.CXSetHeldCallAction
 import platform.CallKit.CXSetMutedCallAction
 import platform.CallKit.CXStartCallAction
-import platform.Foundation.NSObject
 import platform.Foundation.NSUUID
+import platform.darwin.NSObject
 import platform.darwin.dispatch_get_main_queue
 
 /**
@@ -103,17 +106,19 @@ internal class SystemCallBridge(
 
     private fun buildCallUpdate(call: Call): CXCallUpdate =
         CXCallUpdate().apply {
-            remoteHandle = CXHandle(type = CXHandleTypePhoneNumber, value = call.number)
+            val isVoip = call.scheme == "sip"
+            val handleType = if (isVoip) CXHandleTypeGeneric else CXHandleTypePhoneNumber
+            val handleValue = if (isVoip) "sip:${call.number}" else call.number
+            remoteHandle = CXHandle(type = handleType, value = handleValue)
             localizedCallerName = call.displayName
             supportsHolding = true
-            supportsDTMF = false
+            supportsDTMF = !isVoip
             supportsGrouping = false
             supportsUngrouping = false
         }
 
     private fun buildProvider(appName: String): CXProvider {
-        val config = CXProviderConfiguration().apply {
-            localizedName = appName
+        val config = CXProviderConfiguration(localizedName = appName).apply {
             supportsVideo = false
             maximumCallGroups = 1u
             maximumCallsPerCallGroup = 1u

@@ -28,7 +28,7 @@ Ringlr is a Kotlin Multiplatform Mobile (KMM) library for handling phone calls a
 - Make and manage outgoing phone calls
 - Answer incoming calls (via system UI)
 - Mute, hold, and end active calls
-- Route audio to speaker, earpiece, Bluetooth, or wired headset
+- Route audio to speaker or earpiece; iOS auto-routes to connected Bluetooth/wired headset
 - Request and check call and microphone permissions
 - Real-time call state callbacks
 - Android Telecom framework integration
@@ -36,9 +36,107 @@ Ringlr is a Kotlin Multiplatform Mobile (KMM) library for handling phone calls a
 
 ---
 
+## VoIP / SIP Support
+
+Ringlr provides the **UI and call lifecycle layer** for VoIP/SIP calls — it does not bundle a SIP stack or media engine.
+
+### How it works
+
+| Layer | Ringlr's role | Your responsibility |
+|---|---|---|
+| System call UI (CallKit / Telecom) | Handled by Ringlr | — |
+| Call state (dialing, active, hold, end) | Handled by Ringlr | — |
+| SIP signaling (REGISTER, INVITE, BYE) | Not included | Your SIP stack |
+| Media / audio (RTP, codecs, SRTP) | Not included | Your SIP stack |
+
+### Android
+
+Android removed its built-in `SipManager` API in **Android 12 (API 31)** with no official replacement.
+
+On **API ≤ 30**, Ringlr uses the system `SipManager` automatically after `configureSipAccount()`.
+
+On **API 31+**, `configureSipAccount()` returns `CallError.SipUnsupported`. The recommended flow:
+
+1. Establish your session with a SIP/VoIP library (Linphone, PJSIP, WebRTC, etc.)
+2. Once connected, call `startOutgoingCall(number, displayName, scheme = "sip")` so Ringlr registers the call with the Telecom framework and shows system UI
+
+### iOS
+
+CallKit is transport-agnostic — it shows the system call UI regardless of the underlying protocol. `configureSipAccount()` on iOS stores the profile for your use; CallKit handles the UI automatically via `startOutgoingCall(scheme = "sip")`.
+
+### VoIP vs SIP
+
+- **VoIP** — any voice call over the internet (WhatsApp, FaceTime, Zoom are all VoIP)
+- **SIP** — one open protocol for VoIP (what `scheme = "sip"` targets)
+- **WebRTC** — another common VoIP protocol; not covered by the SIP scheme
+
+---
+
+## VoIP Push Notifications
+
+VoIP push wakes the app for an incoming call even when it is suspended. Without it, iOS will not display the incoming call screen reliably.
+
+### iOS (PushKit — automatic)
+
+```kotlin
+val registrar = VoipPushRegistrar(platformConfig)
+registrar.register(object : VoipPushListener {
+    override fun onTokenRefreshed(token: String) {
+        // Send token to your push server
+    }
+    override fun onIncomingCall(payload: VoipPushPayload) {
+        // CallKit system UI is already shown by Ringlr.
+        // Use payload for your own in-app handling if needed.
+    }
+})
+```
+
+PushKit delivers the push directly to the delegate. Ringlr calls `reportIncomingCall` on CallKit automatically — no extra steps needed.
+
+Expected push payload keys from your server:
+
+| Key | Value |
+|---|---|
+| `call_id` | Unique call identifier |
+| `caller_number` | Phone number or SIP address |
+| `caller_name` | Display name |
+| `scheme` | `"sip"` or `"tel"` |
+
+### Android (FCM — app bridges to Ringlr)
+
+```kotlin
+// In Application.onCreate
+val registrar = VoipPushRegistrar(platformConfig)
+registrar.register(object : VoipPushListener {
+    override fun onTokenRefreshed(token: String) { sendToServer(token) }
+    override fun onIncomingCall(payload: VoipPushPayload) { /* show in-app UI */ }
+})
+
+// In your FirebaseMessagingService
+override fun onNewToken(token: String) {
+    registrar.handleTokenRefresh(token)
+}
+
+override fun onMessageReceived(message: RemoteMessage) {
+    if (message.data["type"] == "voip") {
+        registrar.handleVoipPush(
+            VoipPushPayload(
+                callId       = message.data["call_id"]       ?: "",
+                callerNumber = message.data["caller_number"] ?: "",
+                callerName   = message.data["caller_name"]   ?: "Unknown",
+                scheme       = message.data["scheme"]        ?: "sip"
+            )
+        )
+    }
+}
+```
+
+Ringlr notifies `onIncomingCall` and registers the call with the Telecom framework for the system call log. Add `MANAGE_OWN_CALLS` to your manifest for the system call screen to appear.
+
+---
+
 ## Upcoming Changes
 
-- ✨ VoIP / SIP support
 - ✨ Custom in-app calling UI
 - ✨ Publishing on Maven Central
 
@@ -117,6 +215,8 @@ suspend fun getCurrentAudioRoute(): CallResult<AudioRoute>
 
 `AudioRoute` values: `SPEAKER`, `EARPIECE`, `BLUETOOTH`, `WIRED_HEADSET`
 
+> **iOS note:** `SPEAKER` and `EARPIECE` are controlled via `AVAudioSession` port override. For `BLUETOOTH` and `WIRED_HEADSET`, iOS automatically routes to any connected device when the speaker override is removed — no additional API call is required. Use `AVRoutePickerView` for fine-grained Bluetooth device selection.
+
 ### Callbacks
 
 ```kotlin
@@ -166,7 +266,7 @@ shared/
                 ├── ActiveCallRegistry.kt      # Tracks Call ↔ NSUUID
                 ├── SystemCallBridge.kt        # CXProviderDelegate
                 ├── CallActionDispatcher.kt    # Submits CXTransactions
-                └── CallAudioRouter.kt         # AVAudioSession routing
+                └── CallAudioRouter.kt         # AVAudioSession speaker/earpiece override; iOS routes Bluetooth/wired automatically
 ```
 
 ---

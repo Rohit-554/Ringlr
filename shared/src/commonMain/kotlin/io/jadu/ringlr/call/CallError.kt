@@ -16,4 +16,14 @@ sealed class CallError : Exception() {
     data class NetworkError(override val message: String) : CallError()
     data class ServiceNotInitialized(override val message: String) : CallError()
     data class ServiceError(override val message: String, val code: Int) : CallError()
+
+    /**
+     * Returned when SIP/VoIP calling is requested on a platform or OS version that
+     * does not provide a built-in SIP stack.
+     *
+     * On Android 12+ (API 31+), Google removed native SIP support with no official
+     * replacement. Ringlr covers the Telecom/CallKit UI layer; the app must supply
+     * its own SIP or VoIP stack for signaling and media.
+     */
+    data class SipUnsupported(override val message: String) : CallError()
 }
