@@ -6,6 +6,7 @@ import io.jadu.ringlr.call.callkit.ActiveCallRegistry
 import io.jadu.ringlr.call.callkit.CallActionDispatcher
 import io.jadu.ringlr.call.callkit.CallAudioRouter
 import io.jadu.ringlr.call.callkit.SystemCallBridge
+import platform.CallKit.CXAnswerCallAction
 import platform.CallKit.CXEndCallAction
 import platform.CallKit.CXHandle
 import platform.CallKit.CXHandleTypeGeneric
@@ -112,6 +113,16 @@ actual class CallManager actual constructor(
 
     actual override suspend fun getCurrentAudioRoute(): CallResult<AudioRoute> =
         CallResult.Success(audioRouter.currentRoute())
+
+    actual override suspend fun answerCall(callId: String): CallResult<Unit> = runCatching {
+        val uuid = registry.uuidFor(callId) ?: throw CallError.CallNotFound(callId)
+        dispatcher.dispatch(CXTransaction(action = CXAnswerCallAction(callUUID = uuid)))
+    }.toCallResult()
+
+    actual override suspend fun declineCall(callId: String): CallResult<Unit> = runCatching {
+        val uuid = registry.uuidFor(callId) ?: throw CallError.CallNotFound(callId)
+        dispatcher.dispatch(CXTransaction(action = CXEndCallAction(callUUID = uuid)))
+    }.toCallResult()
 
     actual override suspend fun checkPermissions(): CallResult<Unit> =
         CallResult.Success(Unit)

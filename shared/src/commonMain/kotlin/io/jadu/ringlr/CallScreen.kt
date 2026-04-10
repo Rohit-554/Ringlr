@@ -46,12 +46,6 @@ import io.jadu.ringlr.permission.delegate.CALL_PHONE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-/**
- * The single screen of the Ringlr demo.
- *
- * Shows a [Dialer] when no call is active, and switches to [ActiveCallPanel]
- * once a call is in progress. Call state changes arrive via [ObserveCallState].
- */
 @Composable
 fun CallScreen(callManager: CallManager, permissionsController: PermissionsController) {
     val scope = rememberCoroutineScope()
@@ -73,8 +67,8 @@ fun CallScreen(callManager: CallManager, permissionsController: PermissionsContr
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            if (activeCall == null) {
-                Dialer(
+            when {
+                activeCall == null -> Dialer(
                     errorMessage = errorMessage,
                     onCallRequested = { number ->
                         errorMessage = ""
@@ -86,8 +80,13 @@ fun CallScreen(callManager: CallManager, permissionsController: PermissionsContr
                         )
                     }
                 )
-            } else {
-                ActiveCallPanel(
+                activeCall!!.state == CallState.RINGING -> IncomingCallScreen(
+                    call = activeCall!!,
+                    callManager = callManager,
+                    onCallAnswered = { activeCall = activeCall!!.copy(state = CallState.ACTIVE) },
+                    onCallDeclined = { activeCall = null }
+                )
+                else -> ActiveCallPanel(
                     call = activeCall!!,
                     callManager = callManager,
                     onCallEnded = { activeCall = null }
@@ -206,6 +205,84 @@ private fun ActiveCallPanel(call: Call, callManager: CallManager, onCallEnded: (
             ) {
                 Text("End Call", style = MaterialTheme.typography.titleMedium)
             }
+        }
+    }
+}
+
+@Composable
+private fun IncomingCallScreen(
+    call: Call,
+    callManager: CallManager,
+    onCallAnswered: () -> Unit,
+    onCallDeclined: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Incoming Call", style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Spacer(Modifier.height(8.dp))
+
+            CallerInfo(call)
+
+            Spacer(Modifier.height(32.dp))
+
+            CallResponseRow(
+                onAccepted = {
+                    scope.launch {
+                        if (callManager.answerCall(call.id) is CallResult.Success) onCallAnswered()
+                    }
+                },
+                onDeclined = {
+                    scope.launch {
+                        callManager.declineCall(call.id)
+                        onCallDeclined()
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun CallerInfo(call: Call) {
+    Text(call.displayName, style = MaterialTheme.typography.titleLarge)
+    Text(
+        text = call.number,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun CallResponseRow(onAccepted: () -> Unit, onDeclined: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Button(
+            onClick = onDeclined,
+            modifier = Modifier.size(width = 120.dp, height = 52.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+        ) {
+            Text("Decline", style = MaterialTheme.typography.titleMedium)
+        }
+
+        Button(
+            onClick = onAccepted,
+            modifier = Modifier.size(width = 120.dp, height = 52.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+        ) {
+            Text("Accept", style = MaterialTheme.typography.titleMedium)
         }
     }
 }

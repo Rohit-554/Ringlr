@@ -382,6 +382,30 @@ actual class CallManager actual constructor(
         return if (audioManager.isSpeakerphoneOn) AudioRoute.SPEAKER else AudioRoute.EARPIECE
     }
 
+    actual override suspend fun answerCall(callId: String): CallResult<Unit> {
+        val ringingCall = connections[callId]
+            ?: return CallResult.Error(CallError.CallNotFound(callId))
+        return try {
+            ringingCall.onAnswer()
+            CallResult.Success(Unit)
+        } catch (e: Exception) {
+            CallResult.Error(CallError.ServiceError("Failed to answer call: ${e.message}", -1))
+        }
+    }
+
+    actual override suspend fun declineCall(callId: String): CallResult<Unit> {
+        val ringingCall = connections[callId]
+            ?: return CallResult.Error(CallError.CallNotFound(callId))
+        return try {
+            ringingCall.setDisconnected(android.telecom.DisconnectCause(android.telecom.DisconnectCause.REJECTED))
+            ringingCall.destroy()
+            connections.remove(callId)
+            CallResult.Success(Unit)
+        } catch (e: Exception) {
+            CallResult.Error(CallError.ServiceError("Failed to decline call: ${e.message}", -1))
+        }
+    }
+
     actual override suspend fun checkPermissions(): CallResult<Unit> {
         return CallResult.Success(Unit)
     }
