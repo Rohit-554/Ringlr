@@ -143,39 +143,24 @@ class TelecomConnectionService : ConnectionService() {
         }
     }
 
-    companion object {
-        object CallStateManager {
-            private val callbacks = mutableSetOf<CallStateCallback>()
-            private val audioCallbacks = mutableSetOf<AudioRouteCallback>()
+}
 
-            fun registerCallback(callback: CallStateCallback) {
-                callbacks.add(callback)
-            }
+object CallStateManager {
+    private val callbacks = mutableSetOf<CallStateCallback>()
+    private val audioCallbacks = mutableSetOf<AudioRouteCallback>()
 
-            fun unregisterCallback(callback: CallStateCallback) {
-                callbacks.remove(callback)
-            }
+    fun registerCallback(callback: CallStateCallback) = callbacks.add(callback)
+    fun unregisterCallback(callback: CallStateCallback) = callbacks.remove(callback)
+    fun registerAudioCallback(callback: AudioRouteCallback) = audioCallbacks.add(callback)
+    fun unregisterAudioCallback(callback: AudioRouteCallback) = audioCallbacks.remove(callback)
 
-            fun registerAudioCallback(callback: AudioRouteCallback) {
-                audioCallbacks.add(callback)
-            }
+    internal fun notifyCallStateChanged(call: Call) =
+        callbacks.forEach { it.onCallStateChanged(call) }
 
-            fun unregisterAudioCallback(callback: AudioRouteCallback) {
-                audioCallbacks.remove(callback)
-            }
+    internal fun notifyCallFailed(call: Call, error: String) =
+        callbacks.filterIsInstance<ExtendedCallStateCallback>()
+            .forEach { it.onCallFailed(call, error) }
 
-            internal fun notifyCallStateChanged(call: Call) {
-                callbacks.forEach { it.onCallStateChanged(call) }
-            }
-
-            internal fun notifyCallFailed(call: Call, error: String) {
-                callbacks.filterIsInstance<ExtendedCallStateCallback>()
-                    .forEach { it.onCallFailed(call, error) }
-            }
-
-            internal fun notifyAudioRouteChanged(route: AudioRoute) {
-                audioCallbacks.forEach { it.onAudioRouteChanged(route) }
-            }
-        }
-    }
+    internal fun notifyAudioRouteChanged(route: AudioRoute) =
+        audioCallbacks.forEach { it.onAudioRouteChanged(route) }
 }

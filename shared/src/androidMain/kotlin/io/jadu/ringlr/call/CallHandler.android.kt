@@ -71,6 +71,22 @@ actual class CallManager actual constructor(
     private val sipCalls = mutableMapOf<String, SipAudioCall>()
     private val callStateCallbacks = mutableSetOf<CallStateCallback>()
 
+    private val telecomBridge = object : CallStateCallback {
+        override fun onCallStateChanged(call: Call) {
+            callStateCallbacks.forEach { it.onCallStateChanged(call) }
+        }
+        override fun onCallAdded(call: Call) {
+            callStateCallbacks.forEach { it.onCallAdded(call) }
+        }
+        override fun onCallRemoved(call: Call) {
+            callStateCallbacks.forEach { it.onCallRemoved(call) }
+        }
+    }
+
+    init {
+        CallStateManager.registerCallback(telecomBridge)
+    }
+
     @Suppress("DEPRECATION")
     private var activeSipManager: SipManager? = null
 
@@ -416,6 +432,11 @@ actual class CallManager actual constructor(
 
     actual override fun unregisterCallStateCallback(callback: CallStateCallback) {
         callStateCallbacks.remove(callback)
+    }
+
+    fun release() {
+        CallStateManager.unregisterCallback(telecomBridge)
+        callStateCallbacks.clear()
     }
 
     companion object {

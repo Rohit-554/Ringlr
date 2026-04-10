@@ -35,10 +35,14 @@ class PhoneAccountRegistrar(private val context: Context) {
     }
 
     internal fun registerPhoneAccount(context: Context, telecomManager: TelecomManager) {
+        val capabilities = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            PhoneAccount.CAPABILITY_SELF_MANAGED
+        } else {
+            PhoneAccount.CAPABILITY_CALL_PROVIDER
+        }
         val phoneAccount = PhoneAccount.builder(defaultAccountHandle, CALL_SDK_ID)
-            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
+            .setCapabilities(capabilities)
             .build()
-
         telecomManager.registerPhoneAccount(phoneAccount)
     }
 
