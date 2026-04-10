@@ -174,19 +174,13 @@ body {
   border: none;
   cursor: pointer;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  align-items: center;
+  justify-content: center;
   padding: 6px;
+  color: var(--text-muted);
+  transition: color 0.15s;
 }
-.menu-btn span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--text-muted);
-  border-radius: 2px;
-  transition: background 0.15s;
-}
-.menu-btn:hover span { background: var(--text); }
+.menu-btn:hover { color: var(--text); }
 
 .topbar-gh { color: var(--text-muted); transition: color 0.15s; }
 .topbar-gh:hover { color: var(--text); }
@@ -427,7 +421,7 @@ tbody tr:hover { background: var(--bg-elevated); }
 .platform-card.android { border-top: 3px solid #4caf50; }
 .platform-card.ios     { border-top: 3px solid #6c8eff; }
 
-.platform-icon { font-size: 28px; margin-bottom: 10px; }
+.platform-icon { margin-bottom: 10px; color: var(--text-muted); }
 .platform-card h3 { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 6px; }
 .platform-card p  { font-size: 13px; color: var(--text-muted); margin: 0; }
 
@@ -449,7 +443,7 @@ tbody tr:hover { background: var(--bg-elevated); }
   align-items: flex-start;
 }
 
-.feature-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.feature-icon { flex-shrink: 0; margin-top: 2px; color: var(--accent); }
 .feature-item strong { display: block; font-size: 13.5px; color: var(--text); margin-bottom: 4px; }
 .feature-item p { font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5; }
 
