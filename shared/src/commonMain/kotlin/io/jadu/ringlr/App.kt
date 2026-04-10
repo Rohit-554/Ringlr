@@ -10,10 +10,12 @@ import io.jadu.ringlr.permission.factory.BindEffect
 import io.jadu.ringlr.permission.factory.rememberPermissionsControllerFactory
 
 @Composable
-fun App(configuration: PlatformConfiguration) {
-    val callManager = remember(configuration) {
-        configuration.initializeCallConfiguration()
-        CallManager(configuration)
+fun App(configuration: PlatformConfiguration, callManager: CallManager? = null) {
+    val resolvedCallManager = remember(configuration) {
+        callManager ?: run {
+            configuration.initializeCallConfiguration()
+            CallManager(configuration)
+        }
     }
 
     val factory = rememberPermissionsControllerFactory()
@@ -22,7 +24,7 @@ fun App(configuration: PlatformConfiguration) {
 
     MaterialTheme(colorScheme = darkColorScheme()) {
         CallScreen(
-            callManager = callManager,
+            callManager           = resolvedCallManager,
             permissionsController = permissionsController
         )
     }
