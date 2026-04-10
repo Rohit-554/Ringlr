@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
 <body>
 
@@ -18,7 +19,9 @@
         <span class="logo-ring">◉</span>
         <span class="logo-text">Ringlr</span>
       </div>
-      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">✕</button>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
+        <i data-lucide="x" width="18" height="18"></i>
+      </button>
     </div>
 
     <ul class="nav-list">
@@ -48,7 +51,7 @@
       <li><a href="#call-screen" class="nav-link">CallScreen</a></li>
       <li><a href="#ui-components" class="nav-link">UI Components</a></li>
 
-      <li class="nav-section">VoIP & SIP</li>
+      <li class="nav-section">VoIP &amp; SIP</li>
       <li><a href="#voip-sip" class="nav-link">VoIP / SIP Overview</a></li>
       <li><a href="#voip-push" class="nav-link">Push Notifications</a></li>
 
@@ -60,7 +63,7 @@
 
     <div class="sidebar-footer">
       <a href="https://github.com/Rohit-554/Ringlr" class="gh-link" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        <i data-lucide="github" width="15" height="15"></i>
         GitHub
       </a>
     </div>
@@ -69,14 +72,14 @@
   <!-- ─── Mobile topbar ────────────────────────────────────────────── -->
   <header class="topbar">
     <button class="menu-btn" id="menuBtn" aria-label="Open menu">
-      <span></span><span></span><span></span>
+      <i data-lucide="menu" width="22" height="22"></i>
     </button>
     <div class="topbar-logo">
       <span class="logo-ring">◉</span>
       <span class="logo-text">Ringlr</span>
     </div>
     <a href="https://github.com/Rohit-554/Ringlr" class="topbar-gh" target="_blank" rel="noopener" aria-label="GitHub">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      <i data-lucide="github" width="20" height="20"></i>
     </a>
   </header>
 
@@ -98,7 +101,10 @@
       </p>
       <div class="hero-actions">
         <a href="#setup" class="btn btn-primary">Get Started</a>
-        <a href="https://github.com/Rohit-554/Ringlr" class="btn btn-outline" target="_blank" rel="noopener">View on GitHub</a>
+        <a href="https://github.com/Rohit-554/Ringlr" class="btn btn-outline" target="_blank" rel="noopener">
+          <i data-lucide="github" width="16" height="16"></i>
+          View on GitHub
+        </a>
       </div>
     </section>
 
@@ -117,12 +123,16 @@
 
       <div class="platform-grid">
         <div class="platform-card android">
-          <div class="platform-icon">🤖</div>
+          <div class="platform-icon">
+            <i data-lucide="smartphone" width="28" height="28"></i>
+          </div>
           <h3>Android</h3>
           <p>Telecom framework, <code>ConnectionService</code>, audio routing via <code>AudioManager</code>, FCM push</p>
         </div>
         <div class="platform-card ios">
-          <div class="platform-icon">🍎</div>
+          <div class="platform-icon">
+            <i data-lucide="tablet-smartphone" width="28" height="28"></i>
+          </div>
           <h3>iOS</h3>
           <p>CallKit, <code>CXProvider</code>, <code>AVAudioSession</code>, PushKit VoIP push</p>
         </div>
@@ -134,56 +144,56 @@
       <h2>Features</h2>
       <div class="feature-grid">
         <div class="feature-item">
-          <span class="feature-icon">📞</span>
+          <span class="feature-icon"><i data-lucide="phone-call" width="20" height="20"></i></span>
           <div>
-            <strong>Outgoing & Incoming Calls</strong>
+            <strong>Outgoing &amp; Incoming Calls</strong>
             <p>Place PSTN and SIP calls; answer or decline incoming calls via Ringlr or the system UI.</p>
           </div>
         </div>
         <div class="feature-item">
-          <span class="feature-icon">🔇</span>
+          <span class="feature-icon"><i data-lucide="mic-off" width="20" height="20"></i></span>
           <div>
             <strong>Mute &amp; Hold</strong>
             <p>Toggle mute and hold on any active call with a single <code>suspend</code> call.</p>
           </div>
         </div>
         <div class="feature-item">
-          <span class="feature-icon">🔊</span>
+          <span class="feature-icon"><i data-lucide="volume-2" width="20" height="20"></i></span>
           <div>
             <strong>Audio Routing</strong>
             <p>Switch between speaker, earpiece, Bluetooth, and wired headset at runtime.</p>
           </div>
         </div>
         <div class="feature-item">
-          <span class="feature-icon">📡</span>
+          <span class="feature-icon"><i data-lucide="activity" width="20" height="20"></i></span>
           <div>
             <strong>Real-time Callbacks</strong>
             <p>Register <code>CallStateCallback</code> to react to call lifecycle events as they happen.</p>
           </div>
         </div>
         <div class="feature-item">
-          <span class="feature-icon">🌐</span>
+          <span class="feature-icon"><i data-lucide="globe" width="20" height="20"></i></span>
           <div>
             <strong>VoIP / SIP</strong>
             <p>System-UI integration for SIP and VoIP calls. Bring your own media stack.</p>
           </div>
         </div>
         <div class="feature-item">
-          <span class="feature-icon">🔔</span>
+          <span class="feature-icon"><i data-lucide="bell" width="20" height="20"></i></span>
           <div>
             <strong>VoIP Push</strong>
             <p>PushKit on iOS; FCM bridge on Android — wake the app for incoming calls.</p>
           </div>
         </div>
         <div class="feature-item">
-          <span class="feature-icon">🛡️</span>
+          <span class="feature-icon"><i data-lucide="shield-check" width="20" height="20"></i></span>
           <div>
             <strong>Permission Handling</strong>
             <p>Unified permission controller for microphone, call, and Bluetooth across platforms.</p>
           </div>
         </div>
         <div class="feature-item">
-          <span class="feature-icon">🎨</span>
+          <span class="feature-icon"><i data-lucide="layout" width="20" height="20"></i></span>
           <div>
             <strong>Built-in Call UI</strong>
             <p>Ready-to-use Compose Multiplatform <code>CallScreen</code> with dialer, active call panel, and incoming call screen.</p>
@@ -256,7 +266,6 @@
 }</code></pre>
 
       <h3>5. Sync Gradle</h3>
-      <p>Run <strong>File → Sync Project with Gradle Files</strong> in Android Studio, or:</p>
       <pre><code class="lang-bash">./gradlew build</code></pre>
     </section>
 
@@ -265,11 +274,6 @@
       <h2>Android Initialization</h2>
 
       <h3>Application class</h3>
-      <p>
-        Ringlr needs an application-scoped <code>Context</code> to resolve
-        <code>TelecomManager</code>. Call <code>PlatformConfiguration.init</code>
-        once in your <code>Application.onCreate</code>.
-      </p>
       <pre><code class="lang-kotlin">class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -278,7 +282,6 @@
 }</code></pre>
 
       <h3>AndroidManifest.xml</h3>
-      <p>Register the application class and declare the <code>ConnectionService</code>:</p>
       <pre><code class="lang-xml">&lt;application android:name=".MyApplication"&gt;
 
     &lt;service
@@ -293,8 +296,8 @@
 &lt;/application&gt;</code></pre>
 
       <div class="callout callout-warning">
-        <strong>Required:</strong> Without the <code>TelecomConnectionService</code> declaration,
-        call placement will silently fail on Android.
+        <i data-lucide="alert-triangle" width="16" height="16" style="flex-shrink:0;margin-top:2px"></i>
+        <span><strong>Required:</strong> Without the <code>TelecomConnectionService</code> declaration, call placement will silently fail on Android.</span>
       </div>
 
       <h3>Compose entry point</h3>
@@ -320,8 +323,7 @@
         — never recreate it per call.
       </p>
 
-      <pre><code class="lang-kotlin">// MainViewController.kt (shared iosMain)
-fun MainViewController() = ComposeUIViewController {
+      <pre><code class="lang-kotlin">fun MainViewController() = ComposeUIViewController {
     val configuration = remember {
         PlatformConfiguration.create().also {
             it.initializeCallConfiguration()
@@ -331,7 +333,6 @@ fun MainViewController() = ComposeUIViewController {
 }</code></pre>
 
       <h3>Info.plist</h3>
-      <p>Add the following keys:</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Key</th><th>Purpose</th></tr></thead>
@@ -343,9 +344,8 @@ fun MainViewController() = ComposeUIViewController {
       </div>
 
       <div class="callout callout-info">
-        <strong>Note:</strong> iOS CallKit is transport-agnostic — the system call UI appears
-        regardless of whether you are using PSTN, SIP, or WebRTC. No runtime "CALL_PHONE"
-        equivalent is required.
+        <i data-lucide="info" width="16" height="16" style="flex-shrink:0;margin-top:2px"></i>
+        <span><strong>Note:</strong> iOS CallKit is transport-agnostic — the system call UI appears regardless of whether you are using PSTN, SIP, or WebRTC. No runtime "CALL_PHONE" equivalent is required.</span>
       </div>
     </section>
 
@@ -372,7 +372,7 @@ fun MainViewController() = ComposeUIViewController {
             <tr><td><code>CALL_PHONE</code></td><td>Place outgoing calls</td></tr>
             <tr><td><code>READ_PHONE_STATE</code></td><td>Read active call state</td></tr>
             <tr><td><code>MANAGE_OWN_CALLS</code></td><td>Register a custom phone account</td></tr>
-            <tr><td><code>READ_PHONE_NUMBERS</code></td><td>Read the device's phone number</td></tr>
+            <tr><td><code>READ_PHONE_NUMBERS</code></td><td>Read the device phone number</td></tr>
             <tr><td><code>MODIFY_AUDIO_SETTINGS</code></td><td>Switch audio routes</td></tr>
             <tr><td><code>RECORD_AUDIO</code></td><td>Microphone access during calls</td></tr>
             <tr><td><code>BLUETOOTH</code> / <code>BLUETOOTH_CONNECT</code></td><td>Bluetooth headset support</td></tr>
@@ -399,10 +399,6 @@ fun MainViewController() = ComposeUIViewController {
     <!-- ─── Runtime Permissions ──────────────────────────────────── -->
     <section id="runtime-permissions" class="doc-section">
       <h2>Runtime Permission Handling</h2>
-      <p>
-        Ringlr provides a unified <code>PermissionsController</code> for requesting permissions
-        at runtime across both platforms.
-      </p>
 
       <h3>Bind the controller in your Composable</h3>
       <pre><code class="lang-kotlin">@Composable
@@ -410,8 +406,6 @@ fun App(configuration: PlatformConfiguration) {
     val factory = rememberPermissionsControllerFactory()
     val controller = remember(factory) { factory.createPermissionsController() }
     BindEffect(controller)
-
-    // pass controller down to your screens
 }</code></pre>
 
       <h3>Request a permission</h3>
@@ -454,35 +448,24 @@ val callManager = CallManager(configuration)</code></pre>
       <h3>Outgoing call</h3>
       <pre><code class="lang-kotlin">val result = callManager.startOutgoingCall(
     number      = "+1234567890",
-    displayName = "John Doe"          // shown in system call UI
+    displayName = "John Doe"
 )
 
 when (result) {
-    is CallResult.Success -> {
-        val call = result.data        // Call(id, number, displayName, state, ...)
-        println("Call started: ${call.id}")
-    }
-    is CallResult.Error -> {
-        println("Failed: ${result.error}")
-    }
+    is CallResult.Success -> println("Call started: ${result.data.id}")
+    is CallResult.Error   -> println("Failed: ${result.error}")
 }</code></pre>
 
       <h3>SIP / VoIP call</h3>
-      <pre><code class="lang-kotlin">// Pass scheme = "sip" to register the call as a SIP call
-val result = callManager.startOutgoingCall(
+      <pre><code class="lang-kotlin">callManager.startOutgoingCall(
     number      = "alice@sip.example.com",
     displayName = "Alice",
     scheme      = "sip"
 )</code></pre>
 
-      <h3>End a call</h3>
-      <pre><code class="lang-kotlin">callManager.endCall(call.id)</code></pre>
-
-      <h3>Answer / Decline incoming</h3>
-      <pre><code class="lang-kotlin">// Answer
+      <h3>End / Answer / Decline</h3>
+      <pre><code class="lang-kotlin">callManager.endCall(call.id)
 callManager.answerCall(call.id)
-
-// Decline
 callManager.declineCall(call.id)</code></pre>
     </section>
 
@@ -490,15 +473,12 @@ callManager.declineCall(call.id)</code></pre>
     <section id="call-controls" class="doc-section">
       <h2>Call Controls</h2>
 
-      <pre><code class="lang-kotlin">// Mute / unmute
-callManager.muteCall(call.id, muted = true)
+      <pre><code class="lang-kotlin">callManager.muteCall(call.id, muted = true)
 callManager.muteCall(call.id, muted = false)
 
-// Hold / resume
 callManager.holdCall(call.id, onHold = true)
 callManager.holdCall(call.id, onHold = false)
 
-// Query state
 val stateResult = callManager.getCallState(call.id)
 val allCalls    = callManager.getActiveCalls()</code></pre>
 
@@ -516,13 +496,11 @@ val allCalls    = callManager.getActiveCalls()</code></pre>
     <section id="audio-routing" class="doc-section">
       <h2>Audio Routing</h2>
 
-      <pre><code class="lang-kotlin">// Set the audio output device
-callManager.setAudioRoute(AudioRoute.SPEAKER)
+      <pre><code class="lang-kotlin">callManager.setAudioRoute(AudioRoute.SPEAKER)
 callManager.setAudioRoute(AudioRoute.EARPIECE)
 callManager.setAudioRoute(AudioRoute.BLUETOOTH)
 callManager.setAudioRoute(AudioRoute.WIRED_HEADSET)
 
-// Query current route
 val routeResult = callManager.getCurrentAudioRoute()</code></pre>
 
       <div class="table-wrap">
@@ -546,7 +524,7 @@ val routeResult = callManager.getCurrentAudioRoute()</code></pre>
             </tr>
             <tr>
               <td><code>WIRED_HEADSET</code></td>
-              <td>Wired headset (API 31+ only)</td>
+              <td>Wired headset (API 31+)</td>
               <td>Auto-routes to connected headset</td>
             </tr>
           </tbody>
@@ -554,9 +532,8 @@ val routeResult = callManager.getCurrentAudioRoute()</code></pre>
       </div>
 
       <div class="callout callout-info">
-        <strong>iOS note:</strong> For <code>BLUETOOTH</code> and <code>WIRED_HEADSET</code>,
-        iOS routes automatically when the speaker override is removed — no extra API call
-        is required. Use <code>AVRoutePickerView</code> for fine-grained Bluetooth device selection.
+        <i data-lucide="info" width="16" height="16" style="flex-shrink:0;margin-top:2px"></i>
+        <span><strong>iOS note:</strong> For <code>BLUETOOTH</code> and <code>WIRED_HEADSET</code>, iOS routes automatically when the speaker override is removed. Use <code>AVRoutePickerView</code> for fine-grained Bluetooth device selection.</span>
       </div>
     </section>
 
@@ -578,23 +555,19 @@ val routeResult = callManager.getCurrentAudioRoute()</code></pre>
 }
 
 callManager.registerCallStateCallback(callback)
-
-// Always unregister to avoid leaks
 callManager.unregisterCallStateCallback(callback)</code></pre>
 
       <div class="callout callout-warning">
-        <strong>Memory:</strong> Always unregister callbacks when your component is destroyed.
-        In Compose, use <code>DisposableEffect</code> — see the <a href="#call-screen">CallScreen</a> section for an example.
+        <i data-lucide="alert-triangle" width="16" height="16" style="flex-shrink:0;margin-top:2px"></i>
+        <span><strong>Memory:</strong> Always unregister callbacks when your component is destroyed. In Compose, use <code>DisposableEffect</code> to tie callback lifetime to composable lifetime.</span>
       </div>
     </section>
 
     <!-- ─── CallResult ───────────────────────────────────────────── -->
     <section id="call-result" class="doc-section">
       <h2>CallResult</h2>
-      <p>
-        Every <code>CallManager</code> operation returns <code>CallResult&lt;T&gt;</code>.
-        No exceptions leak through the API boundary.
-      </p>
+      <p>Every <code>CallManager</code> operation returns <code>CallResult&lt;T&gt;</code>. No exceptions leak through the API boundary.</p>
+
       <pre><code class="lang-kotlin">sealed class CallResult&lt;out T&gt; {
     data class Success&lt;T&gt;(val data: T) : CallResult&lt;T&gt;()
     data class Error(val error: CallError) : CallResult&lt;Nothing&gt;()
@@ -620,7 +593,7 @@ callManager.unregisterCallStateCallback(callback)</code></pre>
     <section id="call-screen" class="doc-section">
       <h2>CallScreen</h2>
       <p>
-        Ringlr ships a ready-to-use <strong>Compose Multiplatform</strong> call screen.
+        Ringlr ships a ready-to-use Compose Multiplatform call screen.
         Drop it into <code>App()</code> and you get a complete calling UI with no extra work.
       </p>
 
@@ -642,15 +615,12 @@ fun App(configuration: PlatformConfiguration) {
     }
 }</code></pre>
 
-      <p>
-        <code>CallScreen</code> automatically handles routing between the three sub-screens
-        based on call state:
-      </p>
+      <p><code>CallScreen</code> routes between three sub-screens based on call state:</p>
 
       <div class="ui-state-grid">
         <div class="ui-state-card">
           <div class="ui-state-label">No active call</div>
-          <div class="ui-state-screen dialer-preview">
+          <div class="ui-state-screen">
             <div class="preview-title">Ringlr Demo</div>
             <div class="preview-input">+1 555 000 0000</div>
             <div class="preview-btn green">Call</div>
@@ -659,7 +629,7 @@ fun App(configuration: PlatformConfiguration) {
         </div>
         <div class="ui-state-card">
           <div class="ui-state-label">Incoming call</div>
-          <div class="ui-state-screen incoming-preview">
+          <div class="ui-state-screen">
             <div class="preview-label">Incoming Call</div>
             <div class="preview-title">John Doe</div>
             <div class="preview-number">+1 555 000 0000</div>
@@ -672,7 +642,7 @@ fun App(configuration: PlatformConfiguration) {
         </div>
         <div class="ui-state-card">
           <div class="ui-state-label">Call in progress</div>
-          <div class="ui-state-screen active-preview">
+          <div class="ui-state-screen">
             <div class="preview-title">John Doe</div>
             <div class="preview-badge active-badge">ACTIVE</div>
             <div class="preview-chips">
@@ -689,15 +659,13 @@ fun App(configuration: PlatformConfiguration) {
     <!-- ─── UI Components ────────────────────────────────────────── -->
     <section id="ui-components" class="doc-section">
       <h2>UI Components</h2>
-      <p>All sub-components are <code>private</code> composables inside <code>CallScreen.kt</code>, composable at the right level of abstraction:</p>
-
       <div class="table-wrap">
         <table>
           <thead><tr><th>Component</th><th>Purpose</th></tr></thead>
           <tbody>
             <tr><td><code>Dialer</code></td><td>Phone number input field and permission-guarded Call button</td></tr>
             <tr><td><code>IncomingCallScreen</code></td><td>Caller info card with Accept / Decline buttons</td></tr>
-            <tr><td><code>ActiveCallPanel</code></td><td>Full active-call card: name, state badge, controls, End Call</td></tr>
+            <tr><td><code>ActiveCallPanel</code></td><td>Active-call card: name, state badge, controls, End Call</td></tr>
             <tr><td><code>CallControlRow</code></td><td>Mute and Hold toggle chips</td></tr>
             <tr><td><code>AudioRouteSelector</code></td><td>Row of chips for switching audio output</td></tr>
             <tr><td><code>CallStateBadge</code></td><td>Colored pill showing current <code>CallState</code></td></tr>
@@ -721,25 +689,22 @@ fun App(configuration: PlatformConfiguration) {
         <table>
           <thead><tr><th>Layer</th><th>Ringlr's role</th><th>Your responsibility</th></tr></thead>
           <tbody>
-            <tr><td>System call UI (CallKit / Telecom)</td><td>✅ Handled</td><td>—</td></tr>
-            <tr><td>Call state (dialing, active, hold, end)</td><td>✅ Handled</td><td>—</td></tr>
-            <tr><td>SIP signaling (REGISTER, INVITE, BYE)</td><td>❌ Not included</td><td>Your SIP stack</td></tr>
-            <tr><td>Media / audio (RTP, codecs, SRTP)</td><td>❌ Not included</td><td>Your SIP stack</td></tr>
+            <tr><td>System call UI (CallKit / Telecom)</td><td>Handled</td><td>—</td></tr>
+            <tr><td>Call state (dialing, active, hold, end)</td><td>Handled</td><td>—</td></tr>
+            <tr><td>SIP signaling (REGISTER, INVITE, BYE)</td><td>Not included</td><td>Your SIP stack</td></tr>
+            <tr><td>Media / audio (RTP, codecs, SRTP)</td><td>Not included</td><td>Your SIP stack</td></tr>
           </tbody>
         </table>
       </div>
 
       <h3>Android</h3>
-      <p>
-        Android removed its built-in <code>SipManager</code> in <strong>Android 12 (API 31)</strong>.
-      </p>
+      <p>Android removed its built-in <code>SipManager</code> in <strong>Android 12 (API 31)</strong>.</p>
       <ul>
         <li><strong>API ≤ 30:</strong> <code>configureSipAccount()</code> sets up the system SIP manager automatically.</li>
-        <li><strong>API 31+:</strong> <code>configureSipAccount()</code> returns <code>CallError.SipUnsupported</code>. Establish your session with Linphone, PJSIP, WebRTC, etc., then call <code>startOutgoingCall(scheme = "sip")</code> to register the call with Telecom.</li>
+        <li><strong>API 31+:</strong> <code>configureSipAccount()</code> returns <code>CallError.SipUnsupported</code>. Establish your session with Linphone, PJSIP, or WebRTC, then call <code>startOutgoingCall(scheme = "sip")</code>.</li>
       </ul>
 
-      <pre><code class="lang-kotlin">// Android 12+ recommended flow
-myVoipStack.connect(sipAddress) { sessionEstablished ->
+      <pre><code class="lang-kotlin">myVoipStack.connect(sipAddress) { sessionEstablished ->
     scope.launch {
         callManager.startOutgoingCall(
             number      = sipAddress,
@@ -750,11 +715,7 @@ myVoipStack.connect(sipAddress) { sessionEstablished ->
 }</code></pre>
 
       <h3>iOS</h3>
-      <p>
-        CallKit is transport-agnostic. <code>configureSipAccount()</code> stores the profile
-        for your own use; CallKit shows the system UI via <code>startOutgoingCall(scheme = "sip")</code>
-        regardless of the underlying protocol.
-      </p>
+      <p>CallKit is transport-agnostic. <code>configureSipAccount()</code> stores the profile for your own use; CallKit shows the system UI via <code>startOutgoingCall(scheme = "sip")</code> regardless of the underlying protocol.</p>
 
       <pre><code class="lang-kotlin">callManager.configureSipAccount(
     SipProfile(
@@ -776,27 +737,20 @@ callManager.startOutgoingCall(
     <!-- ─── VoIP Push ─────────────────────────────────────────────── -->
     <section id="voip-push" class="doc-section">
       <h2>VoIP Push Notifications</h2>
-      <p>
-        VoIP push wakes the app for an incoming call even when it is suspended.
-        Without it, iOS will not reliably display the incoming call screen.
-      </p>
+      <p>VoIP push wakes the app for an incoming call even when it is suspended. Without it, iOS will not reliably display the incoming call screen.</p>
 
       <h3>iOS — PushKit (automatic)</h3>
       <pre><code class="lang-kotlin">val registrar = VoipPushRegistrar(platformConfig)
 registrar.register(object : VoipPushListener {
-    override fun onTokenRefreshed(token: String) {
-        sendTokenToServer(token)
-    }
+    override fun onTokenRefreshed(token: String) { sendTokenToServer(token) }
     override fun onIncomingCall(payload: VoipPushPayload) {
         // CallKit system UI is shown by Ringlr automatically.
-        // Use payload for your own in-app handling if needed.
     }
 })</code></pre>
 
-      <p>Expected push payload keys from your server:</p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Key</th><th>Value</th></tr></thead>
+          <thead><tr><th>Payload key</th><th>Value</th></tr></thead>
           <tbody>
             <tr><td><code>call_id</code></td><td>Unique call identifier</td></tr>
             <tr><td><code>caller_number</code></td><td>Phone number or SIP address</td></tr>
@@ -831,11 +785,6 @@ override fun onMessageReceived(message: RemoteMessage) {
         )
     }
 }</code></pre>
-
-      <div class="callout callout-info">
-        Add <code>MANAGE_OWN_CALLS</code> to your manifest so the system call log entry appears
-        for incoming VoIP calls on Android.
-      </div>
     </section>
 
     <!-- ─── Project Structure ─────────────────────────────────────── -->
@@ -843,41 +792,35 @@ override fun onMessageReceived(message: RemoteMessage) {
       <h2>Project Structure</h2>
       <pre><code class="lang-text">shared/
 └── src/
-    ├── commonMain/               # Shared interfaces, models, expect declarations
-    │   ├── CallScreen.kt         # Compose Multiplatform call UI
+    ├── commonMain/
+    │   ├── CallScreen.kt
     │   ├── App.kt
     │   └── call/
-    │       ├── CallHandler.kt    # expect PlatformConfiguration + CallManager
+    │       ├── CallHandler.kt          # expect PlatformConfiguration + CallManager
     │       ├── CallManagerInterface.kt
-    │       ├── Call.kt
-    │       ├── CallState.kt
-    │       ├── CallResult.kt
-    │       ├── CallError.kt
-    │       ├── AudioRoute.kt
-    │       ├── CallStateCallback.kt
+    │       ├── Call.kt · CallState.kt · CallResult.kt · CallError.kt
+    │       ├── AudioRoute.kt · CallStateCallback.kt
     │       └── voip/
     │           ├── VoipPushRegistrar.kt
     │           ├── VoipPushListener.kt
     │           └── VoipPushPayload.kt
-    ├── androidMain/              # Android Telecom implementation
+    ├── androidMain/
     │   └── call/
     │       ├── CallHandler.android.kt
     │       ├── TelecomConnectionService.kt
     │       ├── PhoneAccountRegistrar.kt
-    │       └── voip/
-    │           └── VoipPushRegistrar.android.kt
-    └── iosMain/                  # iOS CallKit implementation
+    │       └── voip/VoipPushRegistrar.android.kt
+    └── iosMain/
         └── call/
             ├── CallHandler.ios.kt
             ├── callkit/
-            │   ├── ActiveCallRegistry.kt      # Tracks Call ↔ NSUUID
-            │   ├── SystemCallBridge.kt        # CXProviderDelegate
-            │   ├── CallActionDispatcher.kt    # Submits CXTransactions
-            │   └── CallAudioRouter.kt         # AVAudioSession routing
-            └── voip/
-                └── VoipPushRegistrar.ios.kt
+            │   ├── ActiveCallRegistry.kt
+            │   ├── SystemCallBridge.kt
+            │   ├── CallActionDispatcher.kt
+            │   └── CallAudioRouter.kt
+            └── voip/VoipPushRegistrar.ios.kt
 
-demoApp/                          # Android demo application
+demoApp/
 └── src/main/kotlin/io/jadu/ringlr/demo/
     ├── DemoApplication.kt
     └── MainActivity.kt</code></pre>
@@ -887,32 +830,12 @@ demoApp/                          # Android demo application
     <section id="important-notes" class="doc-section">
       <h2>Important Notes</h2>
       <ul class="notes-list">
-        <li>
-          <strong>Always call <code>initializeCallConfiguration()</code> before <code>CallManager</code></strong> —
-          the platform bridges are set up lazily; skipping this causes silent failures.
-        </li>
-        <li>
-          <strong>Call <code>cleanupCallConfiguration()</code> when done</strong> —
-          on iOS this invalidates the <code>CXProvider</code>; on Android it unregisters
-          the phone account.
-        </li>
-        <li>
-          <strong>Android: register <code>TelecomConnectionService</code> in the manifest</strong> —
-          calls will silently fail without it.
-        </li>
-        <li>
-          <strong>iOS: <code>PlatformConfiguration</code> is a singleton</strong> —
-          never recreate it per call; the <code>CXProvider</code> must be stable for
-          the lifetime of the app.
-        </li>
-        <li>
-          <strong>Always unregister callbacks</strong> — use <code>DisposableEffect</code>
-          in Compose to tie callback lifetime to composable lifetime.
-        </li>
-        <li>
-          <strong>SIP on Android 12+ requires an external stack</strong> —
-          the system <code>SipManager</code> was removed in API 31.
-        </li>
+        <li><strong>Always call <code>initializeCallConfiguration()</code> before <code>CallManager</code></strong> — the platform bridges are set up lazily; skipping this causes silent failures.</li>
+        <li><strong>Call <code>cleanupCallConfiguration()</code> when done</strong> — on iOS this invalidates the <code>CXProvider</code>; on Android it unregisters the phone account.</li>
+        <li><strong>Android: register <code>TelecomConnectionService</code> in the manifest</strong> — calls will silently fail without it.</li>
+        <li><strong>iOS: <code>PlatformConfiguration</code> is a singleton</strong> — never recreate it per call; the <code>CXProvider</code> must be stable for the lifetime of the app.</li>
+        <li><strong>Always unregister callbacks</strong> — use <code>DisposableEffect</code> in Compose to tie callback lifetime to composable lifetime.</li>
+        <li><strong>SIP on Android 12+ requires an external stack</strong> — the system <code>SipManager</code> was removed in API 31.</li>
       </ul>
     </section>
 
@@ -925,7 +848,7 @@ demoApp/                          # Android demo application
           <tbody>
             <tr>
               <td>Call never starts on Android</td>
-              <td>Check that <code>TelecomConnectionService</code> is declared in the manifest with <code>BIND_TELECOM_CONNECTION_SERVICE</code> permission</td>
+              <td>Check <code>TelecomConnectionService</code> is declared in the manifest with <code>BIND_TELECOM_CONNECTION_SERVICE</code> permission</td>
             </tr>
             <tr>
               <td>Permission permanently denied</td>
@@ -944,8 +867,8 @@ demoApp/                          # Android demo application
               <td>Use the <code>id</code> from the <code>Call</code> returned by <code>startOutgoingCall()</code>, not a self-generated ID</td>
             </tr>
             <tr>
-              <td><code>SipUnsupported</code> error on Android</td>
-              <td>Android 12+ dropped system SIP. Use an external VoIP stack (Linphone, PJSIP, WebRTC) for signaling and media, then call <code>startOutgoingCall(scheme = "sip")</code></td>
+              <td><code>SipUnsupported</code> on Android</td>
+              <td>Android 12+ dropped system SIP. Use an external stack (Linphone, PJSIP, WebRTC), then call <code>startOutgoingCall(scheme = "sip")</code></td>
             </tr>
           </tbody>
         </table>
@@ -955,7 +878,7 @@ demoApp/                          # Android demo application
     <footer class="doc-footer">
       <p>
         Ringlr is open source under the
-        <a href="https://github.com/Rohit-554/Ringlr/blob/master/LICENSE" target="_blank" rel="noopener">Apache 2.0 License</a>.
+        <a href="https://github.com/Rohit-554/Ringlr/blob/master/LICENSE" target="_blank" rel="noopener">Apache 2.0 License</a>
         &nbsp;·&nbsp;
         <a href="https://github.com/Rohit-554/Ringlr" target="_blank" rel="noopener">GitHub</a>
         &nbsp;·&nbsp;
@@ -965,6 +888,11 @@ demoApp/                          # Android demo application
 
   </main>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
